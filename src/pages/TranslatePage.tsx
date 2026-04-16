@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TranslationPanel } from "@/components/TranslationPanel";
@@ -7,12 +7,29 @@ export default function TranslatePage() {
   const [sourceLanguage, setSourceLanguage] = useState("English");
   const [targetLanguage, setTargetLanguage] = useState("Igbo");
 
-  const handleSwapLanguages = () => {
-    if (sourceLanguage !== "English") {
-      setSourceLanguage(targetLanguage);
+  const handleSwapLanguages = useCallback(() => {
+    setSourceLanguage((prev) => {
+      setTargetLanguage(prev);
+      return targetLanguage;
+    });
+  }, [targetLanguage]);
+
+  // Prevent selecting the same language for both
+  const handleSetSource = useCallback((lang: string) => {
+    if (lang === targetLanguage) {
       setTargetLanguage(sourceLanguage);
     }
-  };
+    setSourceLanguage(lang);
+  }, [targetLanguage, sourceLanguage]);
+
+  const handleSetTarget = useCallback((lang: string) => {
+    if (lang === sourceLanguage) {
+      setSourceLanguage(targetLanguage);
+    }
+    setTargetLanguage(lang);
+  }, [sourceLanguage, targetLanguage]);
+
+  const isReverseMode = sourceLanguage !== "English";
 
   return (
     <div className="pb-24 md:pb-8">
@@ -29,7 +46,9 @@ export default function TranslatePage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
             </span>
-            <span className="text-sm font-medium">Real-time AI Translation</span>
+            <span className="text-sm font-medium">
+              {isReverseMode ? "Voice-first Translation" : "Real-time AI Translation"}
+            </span>
           </motion.div>
 
           <motion.h1
@@ -48,28 +67,27 @@ export default function TranslatePage() {
             transition={{ delay: 0.3 }}
             className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto mb-8"
           >
-            Translate with pronunciation guides for Igbo, Hausa, Yoruba, and Ikwere. 
-            Speak or type — understand and be understood.
+            {isReverseMode
+              ? `Speak ${sourceLanguage} and get instant English translations — or type if you prefer.`
+              : "Translate with pronunciation guides for Igbo, Hausa, Yoruba, and Ikwere. Speak or type — understand and be understood."}
           </motion.p>
         </div>
       </section>
 
-      {/* Language Selection */}
+      {/* Language Selection — bidirectional */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="px-4 pb-6"
       >
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-sm font-semibold text-center text-muted-foreground mb-3 uppercase tracking-wide">
-            Translate to
-          </h2>
-          <LanguageSelector
-            selectedLanguage={targetLanguage}
-            onSelectLanguage={setTargetLanguage}
-          />
-        </div>
+        <LanguageSelector
+          sourceLanguage={sourceLanguage}
+          targetLanguage={targetLanguage}
+          onSelectSource={handleSetSource}
+          onSelectTarget={handleSetTarget}
+          onSwap={handleSwapLanguages}
+        />
       </motion.section>
 
       {/* Translation Panel */}

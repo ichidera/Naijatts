@@ -43,11 +43,18 @@ export function useSpeechSynthesis() {
     const preferredLocales = languageVoiceMap[language] || ["en-US"];
     
     for (const locale of preferredLocales) {
-      const voice = availableVoices.find(v => v.lang.startsWith(locale));
-      if (voice) return voice;
+      // Prefer native locale voices that are NOT remote (local voices tend to sound better)
+      const localVoice = availableVoices.find(v => v.lang.startsWith(locale) && v.localService);
+      if (localVoice) return localVoice;
+      
+      const anyVoice = availableVoices.find(v => v.lang.startsWith(locale));
+      if (anyVoice) return anyVoice;
     }
     
-    // Fallback to any English voice
+    // Fallback: prefer en-NG (Nigerian English) over generic English
+    const nigerianEnglish = availableVoices.find(v => v.lang === "en-NG");
+    if (nigerianEnglish) return nigerianEnglish;
+    
     return availableVoices.find(v => v.lang.startsWith("en")) || availableVoices[0] || null;
   }, [availableVoices]);
 

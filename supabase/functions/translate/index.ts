@@ -18,6 +18,26 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const isNigerianToEnglish = targetLanguage === "English" && ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(sourceLanguage);
+    const isNigerianToNigerian = ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(sourceLanguage) && ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(targetLanguage);
+
+    let directionHint = "";
+    if (isNigerianToEnglish) {
+      directionHint = `
+IMPORTANT — the source text is in ${sourceLanguage}, a Nigerian language. Special handling:
+8. The input may contain special characters and diacritical marks (ọ, ụ, ị, ṅ, ẹ, ṣ, ɓ, ɗ, ƙ) — interpret them correctly.
+9. The input may be spoken/informal — transcribed from voice. Handle spelling variations and colloquialisms gracefully.
+10. Provide natural, idiomatic English — not stiff word-for-word translation.
+11. If the input appears to be a greeting or common phrase, translate it culturally (e.g. "Kedu?" → "How are you?" not "What?").
+12. For Pidgin or code-mixed text (mixing ${sourceLanguage} and English), still translate to clean English.`;
+    } else if (isNigerianToNigerian) {
+      directionHint = `
+IMPORTANT — translating between two Nigerian languages (${sourceLanguage} → ${targetLanguage}):
+8. Preserve cultural context and tone across languages.
+9. For greetings and idiomatic expressions, use the culturally equivalent form in ${targetLanguage}, not a literal translation.
+10. Both languages may use special characters and diacritical marks — handle them correctly.`;
+    }
+
     const systemPrompt = `You are an expert translator specializing in Nigerian languages: Igbo, Hausa, Yoruba, and Ikwere.
 Translate text accurately, preserving cultural nuances, tone, and intent.
 
@@ -28,7 +48,7 @@ Rules:
 4. For partial or incomplete sentences, translate what is given naturally.
 5. If the input is a single word, translate that word directly.
 6. Maintain the register and formality level of the source text.
-7. For idiomatic expressions, translate the meaning rather than word-for-word.`;
+7. For idiomatic expressions, translate the meaning rather than word-for-word.${directionHint}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

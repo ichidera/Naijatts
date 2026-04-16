@@ -7,33 +7,76 @@ export interface TranslationResult {
   error?: string;
 }
 
+type NigerianLang = keyof (typeof phraseLibrary)[0]["translations"];
+const NIGERIAN_LANGUAGES = new Set<string>(["Igbo", "Hausa", "Yoruba", "Ikwere"]);
+
 /**
- * Instant lookup from the local phrase library.
- * Tries exact match first, then prefix match for partial typing.
+ * Bidirectional phrase library lookup.
+ * English → Nigerian:  matches against phrase.english
+ * Nigerian → English:  matches against phrase.translations[sourceLang]
+ * Nigerian → Nigerian: matches source, returns target
  */
 function lookupPhraseLibrary(
   text: string,
+  sourceLanguage: string,
   targetLanguage: string
 ): string | null {
   const normalized = text.trim().toLowerCase().replace(/[?.!,;]+$/, "");
   if (!normalized) return null;
 
-  const lang = targetLanguage as keyof (typeof phraseLibrary)[0]["translations"];
+  const isSourceEnglish = sourceLanguage === "English";
+  const isTargetEnglish = targetLanguage === "English";
 
-  // Exact match
-  for (const phrase of phraseLibrary) {
-    const phraseNorm = phrase.english.toLowerCase().replace(/[?.!,;]+$/, "");
-    if (phraseNorm === normalized) {
-      return phrase.translations[lang] ?? null;
-    }
-  }
-
-  // Prefix match (as user is typing, match phrases that start with input)
-  if (normalized.length >= 3) {
+  if (isSourceEnglish) {
+    // English → Nigerian
+    const lang = targetLanguage as NigerianLang;
     for (const phrase of phraseLibrary) {
       const phraseNorm = phrase.english.toLowerCase().replace(/[?.!,;]+$/, "");
-      if (phraseNorm.startsWith(normalized)) {
+      if (phraseNorm === normalized) {
         return phrase.translations[lang] ?? null;
+      }
+    }
+    // Prefix match for partial typing
+    if (normalized.length >= 3) {
+      for (const phrase of phraseLibrary) {
+        const phraseNorm = phrase.english.toLowerCase().replace(/[?.!,;]+$/, "");
+        if (phraseNorm.startsWith(normalized)) {
+          return phrase.translations[lang] ?? null;
+        }
+      }
+    }
+  } else if (isTargetEnglish) {
+    // Nigerian → English
+    const srcLang = sourceLanguage as NigerianLang;
+    for (const phrase of phraseLibrary) {
+      const phraseText = phrase.translations[srcLang];
+      if (!phraseText) continue;
+      const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
+      if (phraseNorm === normalized) {
+        return phrase.english;
+      }
+    }
+    // Prefix match for partial typing
+    if (normalized.length >= 2) {
+      for (const phrase of phraseLibrary) {
+        const phraseText = phrase.translations[srcLang];
+        if (!phraseText) continue;
+        const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
+        if (phraseNorm.startsWith(normalized)) {
+          return phrase.english;
+        }
+      }
+    }
+  } else if (NIGERIAN_LANGUAGES.has(sourceLanguage) && NIGERIAN_LANGUAGES.has(targetLanguage)) {
+    // Nigerian → Nigerian (e.g. Igbo → Yoruba)
+    const srcLang = sourceLanguage as NigerianLang;
+    const tgtLang = targetLanguage as NigerianLang;
+    for (const phrase of phraseLibrary) {
+      const phraseText = phrase.translations[srcLang];
+      if (!phraseText) continue;
+      const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
+      if (phraseNorm === normalized) {
+        return phrase.translations[tgtLang] ?? null;
       }
     }
   }
@@ -66,7 +109,7 @@ export function useTranslation() {
     }
 
     // Check phrase library first for instant results
-    const libraryMatch = lookupPhraseLibrary(text, targetLanguage);
+    const libraryMatch = lookupPhraseLibrary(text, sourceLanguage, targetLanguage);
     if (libraryMatch) {
       return { translation: libraryMatch, source: "phrase-library" };
     }
@@ -135,7 +178,7 @@ export function useTranslation() {
     }
 
     // Instant phrase library lookup
-    const libraryMatch = lookupPhraseLibrary(text, targetLanguage);
+    const libraryMatch = lookupPhraseLibrary(text, sourceLanguage, targetLanguage);
     if (libraryMatch) {
       abortRef.current?.abort();
       setIsTranslating(false);

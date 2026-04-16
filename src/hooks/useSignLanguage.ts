@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lookupNSL } from "@/data/nslDictionary";
 
 export interface SignGesture {
   word: string;
@@ -43,6 +44,17 @@ export function useSignLanguage() {
     setError(null);
 
     try {
+      // For NSL: try the local dictionary first for instant, accurate gestures
+      if (signLanguageType === "NSL") {
+        const localResult = lookupNSL(text);
+        if (localResult) {
+          setSignData(localResult);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to AI-generated gestures
       const { data, error: fnError } = await supabase.functions.invoke("sign-language", {
         body: { text, sourceLanguage, signLanguageType },
       });

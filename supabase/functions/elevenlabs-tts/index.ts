@@ -64,34 +64,43 @@ function detectNigerianLanguage(text: string): "igbo" | "yoruba" | "hausa" | "ik
  * - Add subtle pauses between tonal syllables for clarity
  * - Preserve diacritical marks (critical for tone)
  * - Slow down complex consonant clusters (gb, kp, nw, ny)
+ * - Insert breathing marks to create natural Nigerian speech cadence
  */
 function preprocessForNigerianTTS(text: string, language: string): string {
   let processed = text;
 
   if (language === "igbo" || language === "ikwere") {
-    // Add micro-pauses around complex Igbo consonant clusters for clearer articulation
-    // The comma creates a natural micro-pause in ElevenLabs
     processed = processed
       // Ensure proper spacing around punctuation for natural pauses
       .replace(/([.!?])\s*/g, '$1 ')
       // Add breathing room around Igbo question particles
       .replace(/\b(kedu|gịnị|olee|ebee)\b/gi, (match) => `${match},`)
+      // Add micro-pauses after Igbo greeting constructions for natural cadence
+      .replace(/\b(nnọọ|dalụ|ndewo|ekele)\b/gi, (match) => `${match}...`)
       // Separate compound words slightly for tonal clarity
       .replace(/([ọụịṅ])([a-zA-Zọụịṅẹọṣàáèéìíòóùú])/gi, '$1$2');
   }
 
   if (language === "yoruba") {
-    // Yoruba has strict tonal rules - preserve all diacritics
-    // Add pauses around honorific prefixes
     processed = processed
-      .replace(/\b(Ọba|Olú|Adé|Ọmọ)\b/gi, (match) => `${match},`);
+      // Add pauses around honorific prefixes
+      .replace(/\b(Ọba|Olú|Adé|Ọmọ)\b/gi, (match) => `${match},`)
+      // Micro-pauses after Yoruba greeting words for natural rhythm
+      .replace(/\b(Bawo|Ẹ kú|Ẹ kàá|Ọ dàá)\b/gi, (match) => `${match}...`)
+      // Slight pause before praise names (oriki-style phrasing)
+      .replace(/\b(omo|ọmọ)\s/gi, (match) => `, ${match}`);
   }
 
   if (language === "hausa") {
-    // Hausa glottalized consonants need emphasis
     processed = processed
-      .replace(/([ɓɗƙ])/gi, '$1');
+      .replace(/([ɓɗƙ])/gi, '$1')
+      // Add natural pauses for Hausa sentence connectors
+      .replace(/\b(kuma|amma|sai|to)\b/gi, (match) => `, ${match},`);
   }
+
+  // Universal: add a slight pause after commas for more deliberate, measured speech
+  // (Nigerian languages tend to have a more rhythmic, spaced-out cadence)
+  processed = processed.replace(/,\s*/g, ', ');
 
   return processed;
 }
@@ -108,33 +117,33 @@ function getVoiceSettings(language: string, userSpeed?: number) {
       return {
         ...baseSettings,
         // High stability preserves tonal contours without drift
-        stability: 0.78,
+        stability: 0.82,
         // Maximum similarity for authentic vocal timbre
-        similarity_boost: 0.92,
+        similarity_boost: 0.95,
         // Moderate style for natural Igbo prosody (rise-fall patterns)
-        style: 0.50,
+        style: 0.55,
         // Slower speed is CRITICAL for Igbo tonal accuracy
         // Igbo has 2-3 tone levels that collapse at higher speeds
-        speed: userSpeed ?? 0.78,
+        speed: userSpeed ?? 0.72,
       };
     case "yoruba":
       return {
         ...baseSettings,
         // Yoruba has 3 tones (high, mid, low) + gliding tones
-        stability: 0.80,
-        similarity_boost: 0.90,
+        stability: 0.84,
+        similarity_boost: 0.93,
         // Higher style for Yoruba's melodic, song-like prosody
-        style: 0.58,
-        speed: userSpeed ?? 0.75,
+        style: 0.62,
+        speed: userSpeed ?? 0.70,
       };
     case "hausa":
       return {
         ...baseSettings,
         // Hausa has 2 tones but complex consonant system
-        stability: 0.75,
-        similarity_boost: 0.88,
-        style: 0.45,
-        speed: userSpeed ?? 0.80,
+        stability: 0.78,
+        similarity_boost: 0.90,
+        style: 0.50,
+        speed: userSpeed ?? 0.75,
       };
     default:
       return {
@@ -145,6 +154,25 @@ function getVoiceSettings(language: string, userSpeed?: number) {
         speed: userSpeed ?? 0.88,
       };
   }
+}
+
+/**
+ * Voice selection strategy for more indigenous-sounding output.
+ * 
+ * ElevenLabs voice IDs — pick the best match for the detected language.
+ * "Sarah" (EXAVITQu4vr4xnSDxMaL) is a good general multilingual voice.
+ * "Charlotte" (XB0fDUnXU5powFXDhCwa) has a warmer, slightly deeper tone.
+ * 
+ * For the most authentic results, users should clone a native speaker voice
+ * via ElevenLabs Professional Voice Cloning and set the voiceId per language
+ * in their environment or UI settings. The settings below are optimized
+ * defaults for the stock voices.
+ */
+function selectVoice(language: string, userVoiceId?: string): string {
+  if (userVoiceId) return userVoiceId;
+
+  // Sarah — best multilingual clarity for tonal languages
+  return "EXAVITQu4vr4xnSDxMaL";
 }
 
 serve(async (req) => {
@@ -179,7 +207,7 @@ serve(async (req) => {
     // Voice selection:
     // Sarah (EXAVITQu4vr4xnSDxMaL) - Best multilingual clarity, excellent tonal reproduction
     // For future: Consider cloning a native Nigerian speaker's voice for ultimate authenticity
-    const selectedVoiceId = voiceId || "EXAVITQu4vr4xnSDxMaL";
+    const selectedVoiceId = selectVoice(detectedLanguage, voiceId);
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}?output_format=mp3_44100_128`,

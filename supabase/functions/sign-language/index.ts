@@ -19,7 +19,29 @@ serve(async (req) => {
   try {
     const { text, sourceLanguage, signLanguageType } = await req.json() as SignLanguageRequest;
 
+    const nslContext = signLanguageType === "NSL" ? `
+
+CRITICAL NSL RULES:
+- NSL uses TOPIC-COMMENT word order (put the topic/subject first, then the comment/action)
+- NSL has NO copula ("to be") — omit signs for "is", "am", "are"
+- Time signs ALWAYS come before the verb
+- YES/NO questions: raised eyebrows + slight forward lean (facialExpression: "questioning", bodyMovement: "lean_forward")
+- WH-questions: furrowed eyebrows + head tilt
+- Negation: head shake accompanies the negative sign
+- Use classifiers heavily for shape, size, and movement descriptions
+- NSL incorporates many culturally Nigerian gestures (e.g., "beckon" with palm-down wave, emphasis with open palm push)
+- Use two-handed signs more frequently than ASL — many NSL signs are symmetrical
+- Emotional intensity is shown through LARGER movements and MORE emphatic facial expressions
+- For Nigerian-specific concepts (market, family hierarchies, greetings), use culturally appropriate sign variations
+
+Available handshapes: open_5, flat_hand, fist, point, c_shape, o_shape, thumbs_up, bent_v, wave, hook, pinch, spread, clap, index_middle, love, emphasis_push, claw, horns, palm_down, beckon, snap
+
+Available facial expressions: neutral, smile, big_smile, serious, questioning, surprised, sad, focused, emphatic, angry, thinking, excited, concerned
+
+Available body movements: none, lean_forward, lean_back, head_nod, head_shake` : "";
+
     const systemPrompt = `You are an expert sign language translator specializing in ${signLanguageType === "NSL" ? "Nigerian Sign Language (NSL)" : "American Sign Language (ASL)"}.
+${nslContext}
 
 Your task is to convert text into detailed sign language instructions that can be used to animate an avatar.
 
@@ -37,7 +59,7 @@ Return a JSON object with:
     {
       "word": "the word/phrase being signed",
       "gloss": "sign language gloss notation",
-      "handShape": "handshape name (e.g., 'flat_hand', 'fist', 'point', 'open_5', 'c_shape', 'o_shape', 'bent_v', 'thumbs_up', 'wave', 'hook', 'pinch', 'spread', 'clap', 'index_middle', 'love', 'emphasis_push')",
+      "handShape": "handshape name (open_5, flat_hand, fist, point, c_shape, o_shape, bent_v, thumbs_up, wave, hook, pinch, spread, clap, index_middle, love, emphasis_push, claw, horns, palm_down, beckon, snap)",
       "dominantHand": {
         "startPosition": { "x": -1 to 1, "y": -1 to 1 },
         "endPosition": { "x": -1 to 1, "y": -1 to 1 },
@@ -46,7 +68,7 @@ Return a JSON object with:
       "nonDominantHand": null or same structure,
       "movement": "description of motion (e.g., 'circular', 'tap', 'wave', 'none')",
       "bodyMovement": "none" | "lean_forward" | "lean_back" | "head_nod" | "head_shake",
-      "facialExpression": "neutral" | "smile" | "big_smile" | "serious" | "questioning" | "surprised" | "sad" | "focused" | "emphatic",
+      "facialExpression": "neutral | smile | big_smile | serious | questioning | surprised | sad | focused | emphatic | angry | thinking | excited | concerned",
       "duration": milliseconds
     }
   ],

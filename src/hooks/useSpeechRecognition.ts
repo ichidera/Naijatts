@@ -49,6 +49,15 @@ declare global {
   }
 }
 
+// Map app language names to BCP-47 locale codes for Web Speech API
+const languageToLocale: Record<string, string> = {
+  English: "en-NG",    // Use Nigerian English for better recognition of Nigerian-accented speech
+  Igbo: "ig-NG",
+  Hausa: "ha-NG",
+  Yoruba: "yo-NG",
+  Ikwere: "ig-NG",     // Closest available — Ikwere is related to Igbo
+};
+
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
@@ -63,15 +72,27 @@ export function useSpeechRecognition() {
     }
   }, []);
 
-  const startListening = useCallback((onResult?: (result: SpeechRecognitionResult) => void) => {
+  const startListening = useCallback((
+    onResult?: (result: SpeechRecognitionResult) => void,
+    language?: string
+  ) => {
     if (!isSupported) return;
+
+    // Stop any existing recognition
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
 
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognitionAPI();
 
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "en-US"; // Primary input language
+
+    // Set locale based on source language
+    const locale = language ? (languageToLocale[language] || "en-US") : "en-US";
+    recognition.lang = locale;
 
     recognition.onstart = () => {
       setIsListening(true);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Volume2, VolumeX, Copy, Check, ArrowRightLeft, Loader2, Sparkles, Zap, BookOpen } from "lucide-react";
+import { Volume2, VolumeX, Copy, Check, ArrowRightLeft, Loader2, Sparkles, Zap, BookOpen, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,8 @@ import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
 import { usePronunciation } from "@/hooks/usePronunciation";
 import { useAvatarContext } from "@/contexts/AvatarContext";
+
+const NIGERIAN_LANGUAGES = new Set(["Igbo", "Hausa", "Yoruba", "Ikwere"]);
 
 interface TranslationPanelProps {
   sourceLanguage: string;
@@ -34,10 +36,23 @@ export function TranslationPanel({
   const { speak: speakBrowser, isSpeaking: isSpeakingBrowser, stop: stopBrowser } = useSpeechSynthesis();
   const { speak: speakEL, isSpeaking: isSpeakingEL, isLoading: isELLoading, stop: stopEL, error: elError } = useElevenLabsTTS();
   const { getPronunciation, pronunciationData, isLoading: isPronunciationLoading, clearPronunciation } = usePronunciation();
-  const { setSignData, setIsPlaying: setAvatarPlaying, setIsVisible: setAvatarVisible } = useAvatarContext();
+  const { setSignData } = useAvatarContext();
 
   const isSpeaking = useElevenLabs ? isSpeakingEL : isSpeakingBrowser;
   const isAudioLoading = useElevenLabs ? isELLoading : false;
+
+  // Is the source a Nigerian language? (voice-prominent mode)
+  const isReverseMode = NIGERIAN_LANGUAGES.has(sourceLanguage);
+  // Should we show pronunciation guide? Only for Nigerian language output
+  const showPronunciation = NIGERIAN_LANGUAGES.has(targetLanguage);
+
+  // Clear inputs on language swap
+  useEffect(() => {
+    setInputText("");
+    setTranslatedText("");
+    setTranslationSource(null);
+    clearPronunciation();
+  }, [sourceLanguage, targetLanguage]);
 
   // Fallback to browser TTS if ElevenLabs fails
   useEffect(() => {
@@ -46,14 +61,14 @@ export function TranslationPanel({
     }
   }, [elError, useElevenLabs]);
 
-  // Auto-fetch pronunciation when translation completes
+  // Auto-fetch pronunciation when translation completes (only for Nigerian targets)
   useEffect(() => {
-    if (translatedText) {
+    if (translatedText && showPronunciation) {
       getPronunciation(translatedText, targetLanguage);
     } else {
       clearPronunciation();
     }
-  }, [translatedText, targetLanguage]);
+  }, [translatedText, targetLanguage, showPronunciation]);
 
   // Real-time translation callback
   const handleRealtimeResult = useCallback((result: TranslationResult) => {
@@ -65,7 +80,7 @@ export function TranslationPanel({
     }
   }, []);
 
-  // Trigger realtime translation on every input change or target language change
+  // Trigger realtime translation on every input change
   useEffect(() => {
     if (!inputText.trim()) {
       setTranslatedText("");
@@ -101,7 +116,6 @@ export function TranslationPanel({
     if (useElevenLabs) {
       const audioUrl = await speakEL(translatedText);
       if (!audioUrl) {
-        // Fallback to browser TTS
         speakBrowser(translatedText, targetLanguage);
       }
     } else {
@@ -121,7 +135,6 @@ export function TranslationPanel({
     setInputText((prev) => prev + (prev ? " " : "") + text);
   };
 
-  // When sign data is available from SignLanguagePanel, push to floating avatar
   const handleSignDataReady = (data: any) => {
     setSignData(data);
   };
@@ -141,7 +154,6 @@ export function TranslationPanel({
           size="icon"
           onClick={onSwapLanguages}
           className="rounded-full bg-primary/10 hover:bg-primary/20 text-primary"
-          disabled={sourceLanguage === "English"}
         >
           <ArrowRightLeft className="h-5 w-5" />
         </Button>
@@ -153,17 +165,33 @@ export function TranslationPanel({
         </div>
       </div>
 
+      {/* Voice-first hint for reverse mode */}
+      {isReverseMode && !inputText && (
+        <div className="text-center mb-4">
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5">
+            <Mic className="h-4 w-4" />
+            Tap <span className="font-semibold text-primary">Speak</span> to talk in {sourceLanguage} — or type below
+          </p>
+        </div>
+      )}
+
       {/* Translation Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Input Panel */}
         <div className="glass-card rounded-2xl p-6 animate-fade-in">
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
-            Enter text in {sourceLanguage}
+            {isReverseMode
+              ? `Speak or type in ${sourceLanguage}`
+              : `Enter text in ${sourceLanguage}`}
           </label>
           <Textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={`Type or speak ${sourceLanguage} text...`}
+            placeholder={
+              isReverseMode
+                ? `Speak ${sourceLanguage} or type here...`
+                : `Type or speak ${sourceLanguage} text...`
+            }
             className="min-h-[160px] bg-transparent border-none resize-none text-lg focus-visible:ring-0 p-0"
           />
           <div className="flex justify-between items-center mt-4 pt-4 border-t border-border/50">
@@ -171,7 +199,12 @@ export function TranslationPanel({
               <span className="text-xs text-muted-foreground">
                 {inputText.length} characters
               </span>
-              <VoiceInputButton onTranscript={handleVoiceInput} />
+              {/* Prominent voice button for reverse mode, normal for forward */}
+              <VoiceInputButton
+                onTranscript={handleVoiceInput}
+                language={sourceLanguage}
+                prominent={isReverseMode}
+              />
             </div>
             <div className="flex items-center gap-2">
               {isTranslating && (
@@ -226,7 +259,9 @@ export function TranslationPanel({
               </p>
             ) : (
               <p className="text-lg text-muted-foreground/50 italic">
-                Start typing to translate...
+                {isReverseMode
+                  ? `Speak or type ${sourceLanguage} to see the English translation...`
+                  : "Start typing to translate..."}
               </p>
             )}
           </div>
@@ -285,8 +320,8 @@ export function TranslationPanel({
         </div>
       </div>
 
-      {/* Auto-shown Pronunciation Guide */}
-      {translatedText && (
+      {/* Pronunciation Guide + Sign Language — only for Nigerian language output */}
+      {translatedText && showPronunciation && (
         <div className="mt-4 space-y-4">
           <PronunciationGuide
             text={translatedText}
@@ -295,7 +330,17 @@ export function TranslationPanel({
             isLoading={isPronunciationLoading}
           />
           
-          {/* Sign Language Panel */}
+          <SignLanguagePanel
+            text={translatedText}
+            sourceLanguage={targetLanguage}
+            onSignDataReady={handleSignDataReady}
+          />
+        </div>
+      )}
+
+      {/* Sign Language only (no pronunciation) for English output */}
+      {translatedText && !showPronunciation && (
+        <div className="mt-4">
           <SignLanguagePanel
             text={translatedText}
             sourceLanguage={targetLanguage}

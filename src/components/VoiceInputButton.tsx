@@ -7,11 +7,14 @@ import { toast } from "sonner";
 
 interface VoiceInputButtonProps {
   onTranscript: (text: string) => void;
+  language?: string;
   disabled?: boolean;
   className?: string;
+  /** Show a larger, prominent voice button (for Nigerian language input) */
+  prominent?: boolean;
 }
 
-export function VoiceInputButton({ onTranscript, disabled, className }: VoiceInputButtonProps) {
+export function VoiceInputButton({ onTranscript, language, disabled, className, prominent }: VoiceInputButtonProps) {
   const { 
     isListening, 
     isSupported, 
@@ -44,7 +47,7 @@ export function VoiceInputButton({ onTranscript, disabled, className }: VoiceInp
         if (result.isFinal) {
           onTranscript(result.transcript);
         }
-      });
+      }, language);
     }
   };
 
@@ -55,23 +58,28 @@ export function VoiceInputButton({ onTranscript, disabled, className }: VoiceInp
   return (
     <div className="relative">
       <Button
-        variant="ghost"
-        size="icon"
+        variant={prominent ? "default" : "ghost"}
+        size={prominent ? "default" : "icon"}
         onClick={handleClick}
         disabled={disabled}
         className={cn(
           "rounded-full transition-all duration-300",
           isListening && "bg-destructive/10 text-destructive animate-pulse",
+          prominent && !isListening && "bg-primary hover:bg-primary/90 text-primary-foreground gap-2 px-4",
           className
         )}
       >
         {isListening ? (
           <>
             <div className="absolute inset-0 rounded-full bg-destructive/20 animate-ping" />
-            <Mic className="h-5 w-5 relative z-10" />
+            <Mic className={cn("relative z-10", prominent ? "h-5 w-5" : "h-5 w-5")} />
+            {prominent && <span className="relative z-10 text-sm font-medium">Listening...</span>}
           </>
         ) : (
-          <Mic className="h-5 w-5" />
+          <>
+            <Mic className="h-5 w-5" />
+            {prominent && <span className="text-sm font-medium">Speak</span>}
+          </>
         )}
       </Button>
       
