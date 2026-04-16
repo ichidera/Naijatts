@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    /* Nigerian-inspired warm palette */
+    --background: 35 30% 97%;
+    --foreground: 25 40% 12%;
+
+    --card: 35 25% 95%;
+    --card-foreground: 25 40% 12%;
+
+    --popover: 35 25% 95%;
+    --popover-foreground: 25 40% 12%;
+
+    /* Terracotta primary */
+    --primary: 16 65% 45%;
+    --primary-foreground: 35 30% 97%;
+
+    /* Forest green secondary */
+    --secondary: 150 35% 25%;
+    --secondary-foreground: 35 30% 97%;
+
+    /* Gold accent */
+    --accent: 42 85% 55%;
+    --accent-foreground: 25 40% 12%;
+
+    --muted: 35 20% 90%;
+    --muted-foreground: 25 20% 45%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 16 65% 45%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(16, 65%, 45%) 0%, hsl(42, 85%, 55%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(150, 35%, 25%) 0%, hsl(150, 40%, 35%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(35, 30%, 97%) 0%, hsl(35, 25%, 92%) 100%);
+    
+    --shadow-soft: 0 4px 20px -4px hsl(25 40% 12% / 0.08);
+    --shadow-card: 0 8px 32px -8px hsl(25 40% 12% / 0.12);
+    --shadow-elevated: 0 16px 48px -12px hsl(25 40% 12% / 0.18);
+
+    /* Language-specific accent colors */
+    --igbo: 16 70% 50%;
+    --hausa: 150 40% 35%;
+    --yoruba: 42 90% 50%;
+    --ikwere: 280 45% 45%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Rich dark background with warmth — not flat black */
+    --background: 25 25% 7%;
+    --foreground: 35 20% 93%;
+
+    --card: 25 20% 11%;
+    --card-foreground: 35 20% 93%;
+
+    --popover: 25 20% 11%;
+    --popover-foreground: 35 20% 93%;
+
+    /* Brighter primary for dark mode contrast (WCAG AA) */
+    --primary: 16 75% 58%;
+    --primary-foreground: 25 30% 6%;
+
+    --secondary: 150 45% 42%;
+    --secondary-foreground: 25 30% 6%;
+
+    --accent: 42 92% 62%;
+    --accent-foreground: 25 30% 6%;
+
+    /* Layered muted tones for depth */
+    --muted: 25 18% 16%;
+    --muted-foreground: 35 12% 62%;
+
+    --destructive: 0 65% 42%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 25 15% 22%;
+    --input: 25 18% 18%;
+    --ring: 16 75% 58%;
+
+    /* Dark mode language colors — higher saturation */
+    --igbo: 16 80% 62%;
+    --hausa: 150 50% 48%;
+    --yoruba: 42 95% 60%;
+    --ikwere: 280 55% 60%;
+
+    /* Dark mode shadows & depth */
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.4), 0 0 0 1px hsl(25 15% 15% / 0.5);
+    --shadow-elevated: 0 16px 48px -12px hsl(0 0% 0% / 0.5), 0 0 0 1px hsl(25 15% 15% / 0.3);
+
+    --sidebar-background: 25 20% 8%;
+    --sidebar-foreground: 35 15% 90%;
+    --sidebar-primary: 16 75% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 25 15% 14%;
+    --sidebar-accent-foreground: 35 15% 90%;
+    --sidebar-border: 25 15% 18%;
+    --sidebar-ring: 16 75% 58%;
+  }
+
+  .dark .pattern-adire {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4763d' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Dark mode enhancements */
+  .dark .glass-card {
+    @apply bg-card/90 backdrop-blur-md border-border/30;
+    box-shadow: var(--shadow-card), inset 0 1px 0 0 hsl(35 20% 20% / 0.1);
+  }
+
+  .dark button:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  .dark input:focus-visible,
+  .dark textarea:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer components {
+  .pattern-adire {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4763d' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50;
+    box-shadow: var(--shadow-card);
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area padding for mobile */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}

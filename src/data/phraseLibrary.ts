@@ -1,0 +1,1261 @@
+export interface Phrase {
+  id: string;
+  english: string;
+  translations: {
+    Igbo: string;
+    Hausa: string;
+    Yoruba: string;
+    Ikwere: string;
+  };
+  category: "greetings" | "common" | "questions" | "responses" | "numbers" | "time" | "travel" | "food" | "family" | "emergencies";
+  difficulty: "beginner" | "intermediate" | "advanced";
+}
+
+export const phraseLibrary: Phrase[] = [
+  // Greetings
+  {
+    id: "g1",
+    english: "Hello",
+    translations: {
+      Igbo: "Nnọọ",
+      Hausa: "Sannu",
+      Yoruba: "Pẹlẹ o",
+      Ikwere: "Nnọọ",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g2",
+    english: "Good morning",
+    translations: {
+      Igbo: "Ụtụtụ ọma",
+      Hausa: "Ina kwana",
+      Yoruba: "Ẹ káàárọ̀",
+      Ikwere: "Ụtụtụ ọma",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g3",
+    english: "Good afternoon",
+    translations: {
+      Igbo: "Ehihie ọma",
+      Hausa: "Ina wuni",
+      Yoruba: "Ẹ káàsán",
+      Ikwere: "Ehihie ọma",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g4",
+    english: "Good evening",
+    translations: {
+      Igbo: "Mgbede ọma",
+      Hausa: "Barka da yamma",
+      Yoruba: "Ẹ kú irọ́lẹ́",
+      Ikwere: "Mgbede ọma",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g5",
+    english: "Goodbye",
+    translations: {
+      Igbo: "Ka ọ dị",
+      Hausa: "Sai an jima",
+      Yoruba: "Ó dàbọ̀",
+      Ikwere: "Ka ọ dị",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g6",
+    english: "Welcome",
+    translations: {
+      Igbo: "Nnọọ",
+      Hausa: "Barka da zuwa",
+      Yoruba: "Ẹ káàbọ̀",
+      Ikwere: "Nnọọ",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+
+  // Common phrases
+  {
+    id: "c1",
+    english: "Thank you",
+    translations: {
+      Igbo: "Daalụ",
+      Hausa: "Na gode",
+      Yoruba: "Ẹ ṣé / O ṣeun",
+      Ikwere: "Daalụ",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c2",
+    english: "Please",
+    translations: {
+      Igbo: "Biko",
+      Hausa: "Don Allah",
+      Yoruba: "Ẹ jọ̀wọ́",
+      Ikwere: "Biko",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c3",
+    english: "I love you",
+    translations: {
+      Igbo: "Afụrụ m gị n'anya",
+      Hausa: "Ina son ka/ki",
+      Yoruba: "Mo nífẹ̀ẹ́ rẹ",
+      Ikwere: "Ahụrụ m gị n'anya",
+    },
+    category: "common",
+    difficulty: "intermediate",
+  },
+  {
+    id: "c4",
+    english: "Yes",
+    translations: {
+      Igbo: "Ee",
+      Hausa: "I / Eh",
+      Yoruba: "Bẹ́ẹ̀ ni",
+      Ikwere: "Ee",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c5",
+    english: "No",
+    translations: {
+      Igbo: "Mba",
+      Hausa: "A'a",
+      Yoruba: "Rárá / Bẹ́ẹ̀ kọ́",
+      Ikwere: "Mba",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c6",
+    english: "Sorry / Excuse me",
+    translations: {
+      Igbo: "Ndo",
+      Hausa: "Yi hakuri",
+      Yoruba: "Má bínú",
+      Ikwere: "Ndo",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+
+  // Questions
+  {
+    id: "q1",
+    english: "How are you?",
+    translations: {
+      Igbo: "Kedu ka ị mere?",
+      Hausa: "Yaya kake/kike?",
+      Yoruba: "Báwo ni?",
+      Ikwere: "Kèdù kà ị mè?",
+    },
+    category: "questions",
+    difficulty: "beginner",
+  },
+  {
+    id: "q2",
+    english: "What is your name?",
+    translations: {
+      Igbo: "Kedụ aha gị?",
+      Hausa: "Menene sunanka/sunaki?",
+      Yoruba: "Kí ni orúkọ rẹ?",
+      Ikwere: "Kèdù aha gị?",
+    },
+    category: "questions",
+    difficulty: "beginner",
+  },
+  {
+    id: "q3",
+    english: "Where are you from?",
+    translations: {
+      Igbo: "Olee ebe ị si?",
+      Hausa: "Daga ina kake/kike?",
+      Yoruba: "Níbo ni o ti wá?",
+      Ikwere: "Olee ebe ị si?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q4",
+    english: "How much is this?",
+    translations: {
+      Igbo: "Ego ole ka nke a?",
+      Hausa: "Nawa ne wannan?",
+      Yoruba: "Èló ni èyí?",
+      Ikwere: "Ego ole ka nke a?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+
+  // Responses
+  {
+    id: "r1",
+    english: "I am fine",
+    translations: {
+      Igbo: "Adị m mma",
+      Hausa: "Lafiya lau",
+      Yoruba: "Mo wà dáadáa",
+      Ikwere: "Adị m mma",
+    },
+    category: "responses",
+    difficulty: "beginner",
+  },
+  {
+    id: "r2",
+    english: "My name is...",
+    translations: {
+      Igbo: "Aha m bụ...",
+      Hausa: "Sunana...",
+      Yoruba: "Orúkọ mi ni...",
+      Ikwere: "Aha m bụ...",
+    },
+    category: "responses",
+    difficulty: "beginner",
+  },
+  {
+    id: "r3",
+    english: "I understand",
+    translations: {
+      Igbo: "Aghọtara m",
+      Hausa: "Na gane",
+      Yoruba: "Mo gbọ́",
+      Ikwere: "Aghọtara m",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+  {
+    id: "r4",
+    english: "I don't understand",
+    translations: {
+      Igbo: "Aghọtaghị m",
+      Hausa: "Ban gane ba",
+      Yoruba: "Mi ò gbọ́",
+      Ikwere: "Aghọtaghị m",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+
+  // Numbers
+  {
+    id: "n1",
+    english: "One",
+    translations: {
+      Igbo: "Otu",
+      Hausa: "Ɗaya",
+      Yoruba: "Ọ̀kan",
+      Ikwere: "Otu",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n2",
+    english: "Two",
+    translations: {
+      Igbo: "Abụọ",
+      Hausa: "Biyu",
+      Yoruba: "Èjì",
+      Ikwere: "Abụọ",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n3",
+    english: "Three",
+    translations: {
+      Igbo: "Atọ",
+      Hausa: "Uku",
+      Yoruba: "Ẹ̀ta",
+      Ikwere: "Atọ",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n4",
+    english: "Ten",
+    translations: {
+      Igbo: "Iri",
+      Hausa: "Goma",
+      Yoruba: "Ẹ̀wá",
+      Ikwere: "Iri",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+
+  // Time
+  {
+    id: "t1",
+    english: "Today",
+    translations: {
+      Igbo: "Taa",
+      Hausa: "Yau",
+      Yoruba: "Lónìí",
+      Ikwere: "Taa",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t2",
+    english: "Tomorrow",
+    translations: {
+      Igbo: "Echi",
+      Hausa: "Gobe",
+      Yoruba: "Ọ̀la",
+      Ikwere: "Echi",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t3",
+    english: "Yesterday",
+    translations: {
+      Igbo: "Ụnyahụ",
+      Hausa: "Jiya",
+      Yoruba: "Àná",
+      Ikwere: "Ụnyahụ",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+
+  // ── Extended Greetings ──
+  {
+    id: "g7",
+    english: "Good night",
+    translations: {
+      Igbo: "Ka chi foo",
+      Hausa: "Mu kwana lafiya",
+      Yoruba: "Ó d'àárọ̀",
+      Ikwere: "Ka chi foo",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g8",
+    english: "How is your family?",
+    translations: {
+      Igbo: "Kedu ka ezinụlọ gị mere?",
+      Hausa: "Yaya iyali?",
+      Yoruba: "Báwo ni ẹbí rẹ?",
+      Ikwere: "Kèdù ka ezinụlọ gị mè?",
+    },
+    category: "greetings",
+    difficulty: "intermediate",
+  },
+  {
+    id: "g9",
+    english: "Long time no see",
+    translations: {
+      Igbo: "Ọ dị anya ka anyị hụrụ",
+      Hausa: "Tun da daɗewa ba mu gani ba",
+      Yoruba: "Ó ti pẹ́ tí a rí",
+      Ikwere: "Ọ dị anya ka anyị hụrụ",
+    },
+    category: "greetings",
+    difficulty: "intermediate",
+  },
+  {
+    id: "g10",
+    english: "See you later",
+    translations: {
+      Igbo: "Ka anyị hụ n'oge na-abịa",
+      Hausa: "Sai anjima",
+      Yoruba: "A ó tún ríra",
+      Ikwere: "Ka anyị hụ n'oge na-abịa",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+  {
+    id: "g11",
+    english: "Nice to meet you",
+    translations: {
+      Igbo: "Ọ dị mma ịhụ gị",
+      Hausa: "Na ji daɗin haɗuwa da kai/ke",
+      Yoruba: "Inú mi dùn láti pàdé rẹ",
+      Ikwere: "Ọ dị mma ịhụ gị",
+    },
+    category: "greetings",
+    difficulty: "beginner",
+  },
+
+  // ── Extended Common ──
+  {
+    id: "c7",
+    english: "Thank you very much",
+    translations: {
+      Igbo: "Daalụ nke ukwuu",
+      Hausa: "Na gode sosai",
+      Yoruba: "Ó ṣeun púpọ̀",
+      Ikwere: "Daalụ nke ukwuu",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c8",
+    english: "You are welcome",
+    translations: {
+      Igbo: "Ọ dịghị ihe",
+      Hausa: "Ba komai",
+      Yoruba: "Kò tọ́pẹ́",
+      Ikwere: "Ọ dịghị ihe",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c9",
+    english: "God bless you",
+    translations: {
+      Igbo: "Chineke gọzie gị",
+      Hausa: "Allah ya sa maka albarka",
+      Yoruba: "Ọlọ́run á bùkún fún ẹ",
+      Ikwere: "Chineke gọzie gị",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c10",
+    english: "I am sorry",
+    translations: {
+      Igbo: "Ebere m / Ndo",
+      Hausa: "Yi hakuri",
+      Yoruba: "Má bínú",
+      Ikwere: "Ndo",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c11",
+    english: "Congratulations",
+    translations: {
+      Igbo: "Ekele",
+      Hausa: "Taya murna",
+      Yoruba: "Ẹ kú oríire",
+      Ikwere: "Ekele",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c12",
+    english: "Happy birthday",
+    translations: {
+      Igbo: "Ọṅụ ụbọchị ọmụmụ",
+      Hausa: "Barka da haihuwa",
+      Yoruba: "Ẹ kú ọjọ́ ìbí",
+      Ikwere: "Ọṅụ ụbọchị ọmụmụ",
+    },
+    category: "common",
+    difficulty: "intermediate",
+  },
+  {
+    id: "c13",
+    english: "I need help",
+    translations: {
+      Igbo: "Achọrọ m enyemaka",
+      Hausa: "Ina bukatar taimako",
+      Yoruba: "Mo nílò ìrànlọ́wọ́",
+      Ikwere: "Achọrọ m enyemaka",
+    },
+    category: "common",
+    difficulty: "intermediate",
+  },
+  {
+    id: "c14",
+    english: "Wait for me",
+    translations: {
+      Igbo: "Chere m",
+      Hausa: "Jira ni",
+      Yoruba: "Dúró fún mi",
+      Ikwere: "Chere m",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c15",
+    english: "Let's go",
+    translations: {
+      Igbo: "Ka anyị gaa",
+      Hausa: "Mu tafi",
+      Yoruba: "Ẹ jẹ́ kí a lọ",
+      Ikwere: "Ka anyị gaa",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c16",
+    english: "Come here",
+    translations: {
+      Igbo: "Bịa ebe a",
+      Hausa: "Zo nan",
+      Yoruba: "Wá ibí yìí",
+      Ikwere: "Bịa ebe a",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+  {
+    id: "c17",
+    english: "Well done",
+    translations: {
+      Igbo: "I mela nke ọma",
+      Hausa: "Madalla",
+      Yoruba: "Ẹ kú iṣẹ́",
+      Ikwere: "I mela nke ọma",
+    },
+    category: "common",
+    difficulty: "beginner",
+  },
+
+  // ── Extended Questions ──
+  {
+    id: "q5",
+    english: "Where is the market?",
+    translations: {
+      Igbo: "Olee ebe ahịa dị?",
+      Hausa: "Ina kasuwa?",
+      Yoruba: "Níbo ni ọjà wà?",
+      Ikwere: "Olee ebe ahịa dị?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q6",
+    english: "What time is it?",
+    translations: {
+      Igbo: "Kedu oge ọ bụ?",
+      Hausa: "Ƙarfe nawa ne?",
+      Yoruba: "Kí ni àgò tó lù?",
+      Ikwere: "Kedu oge ọ bụ?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q7",
+    english: "Do you speak English?",
+    translations: {
+      Igbo: "Ị na-asụ Bekee?",
+      Hausa: "Kana/kina iya Turanci?",
+      Yoruba: "Ṣé o lè sọ èdè Gẹ̀ẹ́sì?",
+      Ikwere: "Ị na-asụ Bekee?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q8",
+    english: "Can you help me?",
+    translations: {
+      Igbo: "Ị nwere ike inyere m aka?",
+      Hausa: "Za ka/ki iya taimake ni?",
+      Yoruba: "Ṣé o lè ràn mí lọ́wọ́?",
+      Ikwere: "Ị nwere ike inyere m aka?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q9",
+    english: "Where is the hospital?",
+    translations: {
+      Igbo: "Olee ebe ụlọ ọgwụ dị?",
+      Hausa: "Ina asibitin?",
+      Yoruba: "Níbo ni ilé ìwòsàn wà?",
+      Ikwere: "Olee ebe ụlọ ọgwụ dị?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+  {
+    id: "q10",
+    english: "What is this?",
+    translations: {
+      Igbo: "Gịnị bụ nke a?",
+      Hausa: "Menene wannan?",
+      Yoruba: "Kí ni èyí?",
+      Ikwere: "Gịnị bụ nke a?",
+    },
+    category: "questions",
+    difficulty: "beginner",
+  },
+  {
+    id: "q11",
+    english: "Where is the toilet?",
+    translations: {
+      Igbo: "Olee ebe mpụta dị?",
+      Hausa: "Ina bayan gida?",
+      Yoruba: "Níbo ni ilé ìgbọ́nsẹ̀ wà?",
+      Ikwere: "Olee ebe mpụta dị?",
+    },
+    category: "questions",
+    difficulty: "beginner",
+  },
+  {
+    id: "q12",
+    english: "How do you say this?",
+    translations: {
+      Igbo: "Kedu ka esi ekwu nke a?",
+      Hausa: "Yaya ake cewa wannan?",
+      Yoruba: "Báwo ni a ṣe ń sọ èyí?",
+      Ikwere: "Kedu ka esi ekwu nke a?",
+    },
+    category: "questions",
+    difficulty: "intermediate",
+  },
+
+  // ── Extended Responses ──
+  {
+    id: "r5",
+    english: "I am not fine",
+    translations: {
+      Igbo: "Adịghị m mma",
+      Hausa: "Ba ni da lafiya",
+      Yoruba: "Mi ò dáadáa",
+      Ikwere: "Adịghị m mma",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+  {
+    id: "r6",
+    english: "I am from Nigeria",
+    translations: {
+      Igbo: "Esi m Nigeria",
+      Hausa: "Daga Nijeriya nake",
+      Yoruba: "Mo ti Nàìjíríà wá",
+      Ikwere: "Esi m Nigeria",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+  {
+    id: "r7",
+    english: "I don't know",
+    translations: {
+      Igbo: "Amaghị m",
+      Hausa: "Ban sani ba",
+      Yoruba: "Mi ò mọ̀",
+      Ikwere: "Amaghị m",
+    },
+    category: "responses",
+    difficulty: "beginner",
+  },
+  {
+    id: "r8",
+    english: "I agree",
+    translations: {
+      Igbo: "Ekwenyere m",
+      Hausa: "Na yarda",
+      Yoruba: "Mo gbà",
+      Ikwere: "Ekwenyere m",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+  {
+    id: "r9",
+    english: "I will come",
+    translations: {
+      Igbo: "Aga m abịa",
+      Hausa: "Zan zo",
+      Yoruba: "Máa wá",
+      Ikwere: "Aga m abịa",
+    },
+    category: "responses",
+    difficulty: "intermediate",
+  },
+  {
+    id: "r10",
+    english: "No problem",
+    translations: {
+      Igbo: "Ọ dịghị nsogbu",
+      Hausa: "Babu matsala",
+      Yoruba: "Kò sí wàhálà",
+      Ikwere: "Ọ dịghị nsogbu",
+    },
+    category: "responses",
+    difficulty: "beginner",
+  },
+
+  // ── Extended Numbers ──
+  {
+    id: "n5",
+    english: "Four",
+    translations: {
+      Igbo: "Anọ",
+      Hausa: "Huɗu",
+      Yoruba: "Ẹ̀rin",
+      Ikwere: "Anọ",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n6",
+    english: "Five",
+    translations: {
+      Igbo: "Ise",
+      Hausa: "Biyar",
+      Yoruba: "Àrún",
+      Ikwere: "Ise",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n7",
+    english: "Six",
+    translations: {
+      Igbo: "Isii",
+      Hausa: "Shida",
+      Yoruba: "Ẹ̀fà",
+      Ikwere: "Isii",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n8",
+    english: "Seven",
+    translations: {
+      Igbo: "Asaa",
+      Hausa: "Bakwai",
+      Yoruba: "Èje",
+      Ikwere: "Asaa",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n9",
+    english: "Eight",
+    translations: {
+      Igbo: "Asatọ",
+      Hausa: "Takwas",
+      Yoruba: "Ẹ̀jọ",
+      Ikwere: "Asatọ",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n10",
+    english: "Nine",
+    translations: {
+      Igbo: "Itoolu",
+      Hausa: "Tara",
+      Yoruba: "Ẹ̀sán",
+      Ikwere: "Itoolu",
+    },
+    category: "numbers",
+    difficulty: "beginner",
+  },
+  {
+    id: "n11",
+    english: "Twenty",
+    translations: {
+      Igbo: "Iri abụọ",
+      Hausa: "Ashirin",
+      Yoruba: "Ogún",
+      Ikwere: "Iri abụọ",
+    },
+    category: "numbers",
+    difficulty: "intermediate",
+  },
+  {
+    id: "n12",
+    english: "Hundred",
+    translations: {
+      Igbo: "Narị",
+      Hausa: "Ɗari",
+      Yoruba: "Ọgọ́rùn",
+      Ikwere: "Narị",
+    },
+    category: "numbers",
+    difficulty: "intermediate",
+  },
+  {
+    id: "n13",
+    english: "Thousand",
+    translations: {
+      Igbo: "Puku",
+      Hausa: "Dubu",
+      Yoruba: "Ẹgbẹ̀rún",
+      Ikwere: "Puku",
+    },
+    category: "numbers",
+    difficulty: "intermediate",
+  },
+
+  // ── Extended Time ──
+  {
+    id: "t4",
+    english: "Now",
+    translations: {
+      Igbo: "Ugbu a",
+      Hausa: "Yanzu",
+      Yoruba: "Báyìí",
+      Ikwere: "Ugbu a",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t5",
+    english: "Later",
+    translations: {
+      Igbo: "Oge na-abịa",
+      Hausa: "Daga baya",
+      Yoruba: "Lẹ́yìn náà",
+      Ikwere: "Oge na-abịa",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t6",
+    english: "Morning",
+    translations: {
+      Igbo: "Ụtụtụ",
+      Hausa: "Safiya",
+      Yoruba: "Àárọ̀",
+      Ikwere: "Ụtụtụ",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t7",
+    english: "Night",
+    translations: {
+      Igbo: "Abalị",
+      Hausa: "Dare",
+      Yoruba: "Alẹ́",
+      Ikwere: "Abalị",
+    },
+    category: "time",
+    difficulty: "beginner",
+  },
+  {
+    id: "t8",
+    english: "What day is today?",
+    translations: {
+      Igbo: "Kedu ụbọchị taa?",
+      Hausa: "Wane rana ce yau?",
+      Yoruba: "Ọjọ́ kí ni ónìí?",
+      Ikwere: "Kedu ụbọchị taa?",
+    },
+    category: "time",
+    difficulty: "intermediate",
+  },
+
+  // ── Travel ──
+  {
+    id: "tr1",
+    english: "Where is the bus stop?",
+    translations: {
+      Igbo: "Olee ebe ụgbọ ala na-akwụsị?",
+      Hausa: "Ina tashar bas?",
+      Yoruba: "Níbo ni ibùdó ọkọ̀ wà?",
+      Ikwere: "Olee ebe ụgbọ ala na-akwụsị?",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr2",
+    english: "I want to go to...",
+    translations: {
+      Igbo: "Achọrọ m ịga...",
+      Hausa: "Ina so in tafi...",
+      Yoruba: "Mo fẹ́ lọ sí...",
+      Ikwere: "Achọrọ m ịga...",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr3",
+    english: "How far is it?",
+    translations: {
+      Igbo: "Olee anya ọ dị?",
+      Hausa: "Yaya nesa yake?",
+      Yoruba: "Báwo ni ó ṣe jìnnà tó?",
+      Ikwere: "Olee anya ọ dị?",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr4",
+    english: "I am lost",
+    translations: {
+      Igbo: "Ehela m",
+      Hausa: "Na ɓace",
+      Yoruba: "Mo ti ṣìnà",
+      Ikwere: "Ehela m",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr5",
+    english: "Turn left",
+    translations: {
+      Igbo: "Tụgharịa aka ekpe",
+      Hausa: "Juya hagu",
+      Yoruba: "Yí padà sí ọ̀sì",
+      Ikwere: "Tụgharịa aka ekpe",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr6",
+    english: "Turn right",
+    translations: {
+      Igbo: "Tụgharịa aka nri",
+      Hausa: "Juya dama",
+      Yoruba: "Yí padà sí ọ̀tún",
+      Ikwere: "Tụgharịa aka nri",
+    },
+    category: "travel",
+    difficulty: "intermediate",
+  },
+  {
+    id: "tr7",
+    english: "Go straight",
+    translations: {
+      Igbo: "Gaa n'ihu",
+      Hausa: "Ci gaba",
+      Yoruba: "Lọ tààrà",
+      Ikwere: "Gaa n'ihu",
+    },
+    category: "travel",
+    difficulty: "beginner",
+  },
+
+  // ── Food & Drink ──
+  {
+    id: "f1",
+    english: "I am hungry",
+    translations: {
+      Igbo: "Agụụ na-agụ m",
+      Hausa: "Ina jin yunwa",
+      Yoruba: "Ebi ń pa mí",
+      Ikwere: "Agụụ na-agụ m",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+  {
+    id: "f2",
+    english: "I am thirsty",
+    translations: {
+      Igbo: "Akpịrị na-akpọ m nkụ",
+      Hausa: "Ina jin ƙishirwa",
+      Yoruba: "Òùngbẹ ń gbé mi",
+      Ikwere: "Akpịrị na-akpọ m nkụ",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+  {
+    id: "f3",
+    english: "Water",
+    translations: {
+      Igbo: "Mmịrị",
+      Hausa: "Ruwa",
+      Yoruba: "Omi",
+      Ikwere: "Mmịrị",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+  {
+    id: "f4",
+    english: "Food",
+    translations: {
+      Igbo: "Nri",
+      Hausa: "Abinci",
+      Yoruba: "Oúnjẹ",
+      Ikwere: "Nri",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+  {
+    id: "f5",
+    english: "The food is delicious",
+    translations: {
+      Igbo: "Nri a dị ụtọ",
+      Hausa: "Abincin yana da daɗi",
+      Yoruba: "Oúnjẹ yìí dùn",
+      Ikwere: "Nri a dị ụtọ",
+    },
+    category: "food",
+    difficulty: "intermediate",
+  },
+  {
+    id: "f6",
+    english: "I want to eat",
+    translations: {
+      Igbo: "Achọrọ m iri nri",
+      Hausa: "Ina so in ci abinci",
+      Yoruba: "Mo fẹ́ jẹun",
+      Ikwere: "Achọrọ m iri nri",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+  {
+    id: "f7",
+    english: "Rice",
+    translations: {
+      Igbo: "Osikapa",
+      Hausa: "Shinkafa",
+      Yoruba: "Ìrẹsì",
+      Ikwere: "Osikapa",
+    },
+    category: "food",
+    difficulty: "beginner",
+  },
+
+  // ── Family ──
+  {
+    id: "fam1",
+    english: "Mother",
+    translations: {
+      Igbo: "Nne",
+      Hausa: "Mama / Uwa",
+      Yoruba: "Ìyá",
+      Ikwere: "Nne",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam2",
+    english: "Father",
+    translations: {
+      Igbo: "Nna",
+      Hausa: "Baba / Uba",
+      Yoruba: "Bàbá",
+      Ikwere: "Nna",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam3",
+    english: "Brother",
+    translations: {
+      Igbo: "Nwanne nwoke",
+      Hausa: "Ɗan'uwa namiji",
+      Yoruba: "Arákùnrin",
+      Ikwere: "Nwanne nwoke",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam4",
+    english: "Sister",
+    translations: {
+      Igbo: "Nwanne nwanyị",
+      Hausa: "Ɗan'uwa mace",
+      Yoruba: "Arábìnrin",
+      Ikwere: "Nwanne nwanyị",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam5",
+    english: "Child",
+    translations: {
+      Igbo: "Nwa",
+      Hausa: "Yaro / Ɗa",
+      Yoruba: "Ọmọ",
+      Ikwere: "Nwa",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam6",
+    english: "Grandparent",
+    translations: {
+      Igbo: "Nna ochie / Nne ochie",
+      Hausa: "Kaka",
+      Yoruba: "Ìyá àgbà / Bàbá àgbà",
+      Ikwere: "Nna ochie / Nne ochie",
+    },
+    category: "family",
+    difficulty: "intermediate",
+  },
+  {
+    id: "fam7",
+    english: "Friend",
+    translations: {
+      Igbo: "Enyi",
+      Hausa: "Aboki",
+      Yoruba: "Ọ̀rẹ́",
+      Ikwere: "Enyi",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+  {
+    id: "fam8",
+    english: "Family",
+    translations: {
+      Igbo: "Ezinụlọ",
+      Hausa: "Iyali",
+      Yoruba: "Ẹbí / Ìdílé",
+      Ikwere: "Ezinụlọ",
+    },
+    category: "family",
+    difficulty: "beginner",
+  },
+
+  // ── Emergencies ──
+  {
+    id: "e1",
+    english: "Help!",
+    translations: {
+      Igbo: "Nyere m aka!",
+      Hausa: "Taimako!",
+      Yoruba: "Ẹ gbà mí!",
+      Ikwere: "Nyere m aka!",
+    },
+    category: "emergencies",
+    difficulty: "beginner",
+  },
+  {
+    id: "e2",
+    english: "Call the police",
+    translations: {
+      Igbo: "Kpọọ ndị uwe ojii",
+      Hausa: "Kira 'yan sanda",
+      Yoruba: "Pe àwọn ọlọ́pàá",
+      Ikwere: "Kpọọ ndị uwe ojii",
+    },
+    category: "emergencies",
+    difficulty: "intermediate",
+  },
+  {
+    id: "e3",
+    english: "I need a doctor",
+    translations: {
+      Igbo: "Achọrọ m dọkịta",
+      Hausa: "Ina bukatar likita",
+      Yoruba: "Mo nílò oníṣègùn",
+      Ikwere: "Achọrọ m dọkịta",
+    },
+    category: "emergencies",
+    difficulty: "intermediate",
+  },
+  {
+    id: "e4",
+    english: "I am sick",
+    translations: {
+      Igbo: "Arịa na-arịa m",
+      Hausa: "Ba ni da lafiya",
+      Yoruba: "Ara mi kò ya mí",
+      Ikwere: "Arịa na-arịa m",
+    },
+    category: "emergencies",
+    difficulty: "beginner",
+  },
+  {
+    id: "e5",
+    english: "It is an emergency",
+    translations: {
+      Igbo: "Ọ bụ mberede",
+      Hausa: "Gaggawa ce",
+      Yoruba: "Pàjáwírì ni",
+      Ikwere: "Ọ bụ mberede",
+    },
+    category: "emergencies",
+    difficulty: "intermediate",
+  },
+  {
+    id: "e6",
+    english: "Fire!",
+    translations: {
+      Igbo: "Ọkụ!",
+      Hausa: "Wuta!",
+      Yoruba: "Iná!",
+      Ikwere: "Ọkụ!",
+    },
+    category: "emergencies",
+    difficulty: "beginner",
+  },
+  {
+    id: "e7",
+    english: "Stop!",
+    translations: {
+      Igbo: "Kwụsị!",
+      Hausa: "Tsaya!",
+      Yoruba: "Dúró!",
+      Ikwere: "Kwụsị!",
+    },
+    category: "emergencies",
+    difficulty: "beginner",
+  },
+];
+
+export const categories = [
+  { id: "greetings", label: "Greetings", icon: "👋" },
+  { id: "common", label: "Common Phrases", icon: "💬" },
+  { id: "questions", label: "Questions", icon: "❓" },
+  { id: "responses", label: "Responses", icon: "💡" },
+  { id: "numbers", label: "Numbers", icon: "🔢" },
+  { id: "time", label: "Time", icon: "⏰" },
+  { id: "travel", label: "Travel", icon: "🧭" },
+  { id: "food", label: "Food & Drink", icon: "🍽️" },
+  { id: "family", label: "Family & People", icon: "👨‍👩‍👧" },
+  { id: "emergencies", label: "Emergencies", icon: "🆘" },
+] as const;
+
+export type CategoryId = typeof categories[number]["id"];
