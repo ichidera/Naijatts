@@ -69,7 +69,7 @@ export default function TranslatePage() {
           >
             {isReverseMode
               ? `Speak ${sourceLanguage} and get instant English translations — or type if you prefer.`
-              : "Translate with pronunciation guides for Igbo, Hausa, Yoruba, and Ikwere. Speak or type — understand and be understood."}
+              : "Translate with pronunciation guides for Igbo, Hausa, Yoruba, and Ikwere. Speak or type. understand and be understood."}
           </motion.p>
         </div>
       </section>
