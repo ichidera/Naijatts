@@ -1357,482 +1357,424 @@ END`}
           </div>
 
           <div className="space-y-8">
-            {/* 4.1 System Implementation and Results */}
+            {/* 4.1 System Implementation and Implementation Results */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">4.1 System Implementation and Results</CardTitle>
+                <CardTitle className="text-lg">4.1 System Implementation and Implementation Results</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  The implementation of NaijaTTS followed an iterative development methodology, with 
-                  each major feature undergoing design, implementation, testing, and refinement cycles. 
-                  This section documents the technical realization of the system design presented in 
-                  Chapter Three, detailing the implementation environment, component implementations, 
-                  and the resulting functional system.
+                  NaijaTTS was implemented as a fully local web application that runs end-to-end from a
+                  developer machine. The system was designed and built on Windows 11 using Visual Studio
+                  Code, Node.js 18 LTS, and the npm package manager. The frontend bundle is produced and
+                  served locally by Vite (using the SWC-powered React plugin) on
+                  <code> http://localhost:5173</code>, while the application's AI-backed endpoints are
+                  invoked through Supabase Edge Functions for the AI-powered translation, pronunciation,
+                  and sign-language generation calls. No third-party hosting platform was used during
+                  development or for the final submission build &mdash; the entire system is portable and
+                  reproducible from the project folder alone.
                 </p>
                 <p>
-                  The development process prioritized core translation functionality first, followed by 
-                  speech integration, sign language features, and finally user experience refinements 
-                  such as theming and responsive design. This approach ensured that fundamental capabilities 
-                  were stable before adding complementary features.
+                  The implementation followed an iterative, feature-driven methodology. Each capability
+                  was developed in a vertical slice: a UI component, a custom React hook to encapsulate
+                  its behavior, and (where required) a data file or edge-function call to back it. Core
+                  translation was built first, followed by speech input and output, then the
+                  pronunciation guide, then sign language animation, and finally the supporting features
+                  such as the phrase library, theming, accessibility polish, and avatar recording. This
+                  ordering kept the translation pipeline &mdash; the heart of the project &mdash; stable
+                  before any auxiliary features were layered on top.
                 </p>
-              </CardContent>
-            </Card>
-
-            {/* 4.2 Implementation Environment */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.2 Implementation Environment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">Development Environment:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong className="text-foreground">Operating System:</strong> Cross-platform (Windows, macOS, Linux)</li>
-                  <li><strong className="text-foreground">IDE:</strong> Visual Studio Code with TypeScript extensions</li>
-                  <li><strong className="text-foreground">Version Control:</strong> Git with GitHub repository</li>
-                  <li><strong className="text-foreground">Package Manager:</strong> npm (Node Package Manager)</li>
-                  <li><strong className="text-foreground">Node.js Version:</strong> 18.x LTS</li>
-                </ul>
-                <p><strong className="text-foreground">Production Environment:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong className="text-foreground">Frontend Hosting:</strong> Lovable Cloud (CDN-backed static hosting)</li>
-                  <li><strong className="text-foreground">Backend Services:</strong> Supabase Edge Functions (Deno runtime)</li>
-                  <li><strong className="text-foreground">AI Services:</strong> Google AI Gateway (Gemini API)</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* 4.3 Frontend Implementation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.3 Frontend Implementation</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
+                <p><strong className="text-foreground">Architectural Outcome</strong></p>
                 <p>
-                  The frontend is implemented as a single-page application (SPA) using React 18 with 
-                  TypeScript. Key implementation details include:
-                </p>
-                <p><strong className="text-foreground">Complete Project Structure:</strong></p>
-                <div className="bg-muted p-4 rounded-lg">
-                  <pre className="text-xs overflow-x-auto">
-{`naijatts/
-├── public/                          # Static public assets
-│   ├── favicon.ico                  # App favicon
-│   ├── placeholder.svg              # Placeholder image
-│   └── robots.txt                   # SEO robots configuration
-│
-├── src/                             # Application source code
-│   ├── assets/                      # Imported static assets
-│   │
-│   ├── components/                  # Reusable UI components
-│   │   ├── ui/                      # Base components (shadcn/ui)
-│   │   │   ├── accordion.tsx
-│   │   │   ├── alert-dialog.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── checkbox.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── label.tsx
-│   │   │   ├── popover.tsx
-│   │   │   ├── progress.tsx
-│   │   │   ├── scroll-area.tsx
-│   │   │   ├── select.tsx
-│   │   │   ├── separator.tsx
-│   │   │   ├── sheet.tsx
-│   │   │   ├── skeleton.tsx
-│   │   │   ├── slider.tsx
-│   │   │   ├── switch.tsx
-│   │   │   ├── tabs.tsx
-│   │   │   ├── textarea.tsx
-│   │   │   ├── toast.tsx
-│   │   │   ├── toaster.tsx
-│   │   │   ├── toggle.tsx
-│   │   │   ├── tooltip.tsx
-│   │   │   └── use-toast.ts
-│   │   │
-│   │   ├── FloatingAvatar.tsx       # Draggable floating sign language overlay
-│   │   ├── LanguageSelector.tsx     # Language picker component
-│   │   ├── Layout.tsx               # Main layout with header, footer, nav
-│   │   ├── NavLink.tsx              # Navigation link component
-│   │   ├── PronunciationGuide.tsx   # Phonetic/IPA pronunciation display
-│   │   ├── SignLanguageAvatar.tsx   # 2D animated avatar with SVG gestures
-│   │   ├── SignLanguagePanel.tsx    # NSL/ASL panel with controls
-│   │   ├── ThemeProvider.tsx        # Dark/light theme context provider
-│   │   ├── ThemeToggle.tsx          # Theme switch button
-│   │   ├── TranslationPanel.tsx     # Main translation input/output UI
-│   │   └── VoiceInputButton.tsx     # Speech-to-text microphone button
-│   │
-│   ├── contexts/                    # React context providers
-│   │   └── AvatarContext.tsx        # Global avatar state & audio sync
-│   │
-│   ├── data/                        # Static data & content
-│   │   └── phraseLibrary.ts         # Common phrases across languages
-│   │
-│   ├── hooks/                       # Custom React hooks
-│   │   ├── use-mobile.tsx           # Mobile device detection
-│   │   ├── use-toast.ts             # Toast notification hook
-│   │   ├── useElevenLabsTTS.ts      # ElevenLabs TTS integration hook
-│   │   ├── usePronunciation.ts      # AI pronunciation guide hook
-│   │   ├── useSignLanguage.ts       # Sign language translation hook
-│   │   ├── useSpeechRecognition.ts  # Browser speech recognition hook
-│   │   ├── useSpeechSynthesis.ts    # Browser Web Speech API TTS hook
-│   │   └── useTranslation.ts        # AI translation hook
-│   │
-│   ├── integrations/                # External service clients
-│   │   └── supabase/
-│   │       ├── client.ts            # Supabase client instance
-│   │       └── types.ts             # Auto-generated database types
-│   │
-│   ├── lib/                         # Utility functions
-│   │   └── utils.ts                 # Class name merge utilities (cn)
-│   │
-│   ├── pages/                       # Route-level page components
-│   │   ├── AboutPage.tsx            # About the project page
-│   │   ├── DocumentationPage.tsx    # FYP documentation (this page)
-│   │   ├── NotFound.tsx             # 404 error page
-│   │   ├── PhrasesPage.tsx          # Common phrases library page
-│   │   └── TranslatePage.tsx        # Main translation page
-│   │
-│   ├── test/                        # Test configuration
-│   │   ├── example.test.ts          # Example test file
-│   │   └── setup.ts                 # Vitest setup
-│   │
-│   ├── App.css                      # App-level styles
-│   ├── App.tsx                      # Root application component
-│   ├── index.css                    # Global styles & design tokens
-│   ├── main.tsx                     # Application entry point
-│   └── vite-env.d.ts                # Vite type declarations
-│
-├── supabase/                        # Backend (Supabase Edge Functions)
-│   ├── functions/
-│   │   ├── elevenlabs-tts/
-│   │   │   └── index.ts             # ElevenLabs TTS voice synthesis
-│   │   ├── pronunciation/
-│   │   │   └── index.ts             # AI pronunciation guide generation
-│   │   ├── sign-language/
-│   │   │   └── index.ts             # AI sign language gesture translation
-│   │   └── translate/
-│   │       └── index.ts             # AI text translation (Gemini)
-│   └── config.toml                  # Supabase project configuration
-│
-├── .env                             # Environment variables (auto-managed)
-├── .gitignore                       # Git ignore rules
-├── README.md                        # Project readme
-├── components.json                  # shadcn/ui configuration
-├── eslint.config.js                 # ESLint configuration
-├── index.html                       # HTML entry point
-├── package.json                     # Node.js dependencies & scripts
-├── postcss.config.js                # PostCSS configuration
-├── tailwind.config.ts               # Tailwind CSS configuration
-├── tsconfig.app.json                # TypeScript app configuration
-├── tsconfig.json                    # TypeScript base configuration
-├── tsconfig.node.json               # TypeScript Node configuration
-├── vite.config.ts                   # Vite build configuration
-└── vitest.config.ts                 # Vitest test configuration`}
-                  </pre>
-                </div>
-                <p><strong className="text-foreground">State Management:</strong></p>
-                <p>
-                  Local component state (useState) handles UI state, while React Query manages server 
-                  state for API calls with automatic caching and refetching. This approach minimizes 
-                  unnecessary network requests and provides smooth user experience during state updates.
-                </p>
-                <p><strong className="text-foreground">Routing:</strong></p>
-                <p>
-                  React Router v6 provides client-side routing with the following routes:
-                </p>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li><code>/</code> - Translation page (main functionality)</li>
-                  <li><code>/phrases</code> - Phrase library</li>
-                  <li><code>/about</code> - About the application</li>
-                  <li><code>/documentation</code> - Project documentation</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* 4.4 Data Source Implementation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.4 Data Source Implementation</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  The primary data source for NaijaTTS is the Gemini API, accessed through Supabase 
-                  Edge Functions. The edge functions abstract the API complexity and handle:
+                  The resulting system is a single-page application written in TypeScript and React 18,
+                  styled with Tailwind CSS and a custom shadcn/ui component layer, and animated with
+                  Framer Motion. Application logic is organised into focused modules:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>API key management (secure server-side storage)</li>
-                  <li>Request formatting with appropriate prompts</li>
-                  <li>Response parsing and error handling</li>
-                  <li>CORS configuration for browser access</li>
+                  <li>
+                    <strong className="text-foreground">Pages</strong> ([src/pages/](src/pages/)) host
+                    the four primary routes: the translation workspace
+                    ([TranslatePage.tsx](src/pages/TranslatePage.tsx)), the phrase library
+                    ([PhrasesPage.tsx](src/pages/PhrasesPage.tsx)), the about page
+                    ([AboutPage.tsx](src/pages/AboutPage.tsx)), and this documentation page
+                    ([DocumentationPage.tsx](src/pages/DocumentationPage.tsx)).
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Feature components</strong>
+                    ([src/components/](src/components/)) encapsulate the translation panel, language
+                    selector, voice input button, pronunciation guide, sign-language panel, floating
+                    avatar, and theme toggle.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Custom hooks</strong>
+                    ([src/hooks/](src/hooks/)) own every async or stateful concern:
+                    [useTranslation.ts](src/hooks/useTranslation.ts) for translation,
+                    [useSpeechRecognition.ts](src/hooks/useSpeechRecognition.ts) for voice input,
+                    [useSpeechSynthesis.ts](src/hooks/useSpeechSynthesis.ts) and
+                    [useElevenLabsTTS.ts](src/hooks/useElevenLabsTTS.ts) for spoken output,
+                    [usePronunciation.ts](src/hooks/usePronunciation.ts) for phonetic guides,
+                    [useSignLanguage.ts](src/hooks/useSignLanguage.ts) for gesture data, and
+                    [useAvatarRecorder.ts](src/hooks/useAvatarRecorder.ts) for capturing avatar
+                    animations as GIFs.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Static data</strong>
+                    ([src/data/](src/data/)) ships a curated
+                    [phraseLibrary.ts](src/data/phraseLibrary.ts) of common phrases, an
+                    [nslDictionary.ts](src/data/nslDictionary.ts) of Nigerian Sign Language gestures, and
+                    [avatarHandShapes.ts](src/data/avatarHandShapes.ts) /
+                    [avatarExpressions.ts](src/data/avatarExpressions.ts) that drive the SVG avatar.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Context providers</strong>
+                    ([src/contexts/AvatarContext.tsx](src/contexts/AvatarContext.tsx)) keep the floating
+                    sign-language avatar in sync with the active translation across routes.
+                  </li>
                 </ul>
-                <p><strong className="text-foreground">Edge Function: translate</strong></p>
+                <p><strong className="text-foreground">Implementation Results</strong></p>
                 <p>
-                  Handles translation requests between English and Nigerian languages. Accepts source 
-                  text, source language, and target language; returns translated text with pronunciation 
-                  guide.
-                </p>
-                <p><strong className="text-foreground">Edge Function: pronunciation</strong></p>
-                <p>
-                  Generates detailed phonetic breakdowns for Nigerian language text, including syllable 
-                  separation and approximate English phonetic equivalents.
-                </p>
-                <p><strong className="text-foreground">Edge Function: sign-language</strong></p>
-                <p>
-                  Converts text to structured sign language data including hand shapes, positions, 
-                  movements, and facial expressions for avatar animation.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* 4.5 Navigation Engine Implementation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.5 Navigation Engine Implementation</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  Navigation within NaijaTTS is implemented through React Router with a custom Layout 
-                  component that provides consistent navigation elements across all pages:
-                </p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong className="text-foreground">Desktop Navigation:</strong> Horizontal navigation 
-                  bar in the header with icon-labeled buttons for each section.</li>
-                  <li><strong className="text-foreground">Mobile Navigation:</strong> Bottom navigation bar 
-                  with fixed positioning for thumb-friendly access, plus a hamburger menu for secondary actions.</li>
-                  <li><strong className="text-foreground">Page Transitions:</strong> Framer Motion provides 
-                  smooth fade and slide animations between pages using AnimatePresence.</li>
-                </ul>
-                <p>
-                  The navigation system automatically highlights the current route and adapts its 
-                  presentation based on viewport size using responsive CSS classes.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* 4.6 Chatbot/Translation Implementation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.6 Translation Engine Implementation</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  The translation functionality is implemented through a combination of frontend components 
-                  and backend edge functions:
-                </p>
-                <p><strong className="text-foreground">Frontend Components:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><code>TranslationPanel.tsx</code>: Main translation interface with input/output areas</li>
-                  <li><code>LanguageSelector.tsx</code>: Target language selection grid</li>
-                  <li><code>VoiceInputButton.tsx</code>: Microphone button for speech input</li>
-                  <li><code>PronunciationGuide.tsx</code>: Displays phonetic guides and audio controls</li>
-                </ul>
-                <p><strong className="text-foreground">Custom Hooks:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><code>useTranslation</code>: Manages translation API calls and state</li>
-                  <li><code>useSpeechRecognition</code>: Handles Web Speech API for voice input</li>
-                  <li><code>useSpeechSynthesis</code>: Manages text-to-speech output</li>
-                  <li><code>usePronunciation</code>: Fetches pronunciation guides from API</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* 4.7 Implementation Results */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.7 Implementation Results</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  The implemented system successfully delivers the following capabilities:
+                  All target features specified in Chapter Three were implemented and verified manually
+                  on the Windows development environment. Concretely:
                 </p>
                 <ol className="list-decimal pl-6 space-y-2">
-                  <li>✅ Real-time translation between English and four Nigerian languages</li>
-                  <li>✅ Pronunciation guides with phonetic notation</li>
-                  <li>✅ Text-to-speech audio output for translations</li>
-                  <li>✅ Voice input for translation requests</li>
-                  <li>✅ Animated sign language avatar (NSL and ASL)</li>
-                  <li>✅ Searchable phrase library with categories</li>
-                  <li>✅ Dark/light theme toggle</li>
-                  <li>✅ Responsive design for all device types</li>
-                  <li>✅ Smooth page transitions and animations</li>
+                  <li>
+                    <strong className="text-foreground">Bidirectional translation</strong> works between
+                    English and the four supported Nigerian languages (Igbo, Hausa, Yoruba, and Ikwere)
+                    as well as between any two Nigerian languages. Curated phrases resolve instantly
+                    from the local phrase library, and anything outside that set is debounced and
+                    forwarded to the AI translation endpoint with a 500 ms typing-pause window so the
+                    UI translates as the user types without flooding the network.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Speech-to-text input</strong> uses the browser's
+                    Web Speech API (<code>SpeechRecognition</code> / <code>webkitSpeechRecognition</code>)
+                    with locale-aware language tags &mdash; <code>en-NG</code>, <code>ig-NG</code>,
+                    <code> ha-NG</code>, <code>yo-NG</code> &mdash; so that Nigerian-accented English and
+                    the supported indigenous languages are recognised more reliably than under the
+                    default <code>en-US</code> locale.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Text-to-speech output</strong> works through two
+                    paths. The primary path uses the browser's <code>speechSynthesis</code> API with a
+                    voice-selection routine that prefers native African locale voices and falls back to
+                    Nigerian English (<code>en-NG</code>) before generic English. A higher-quality
+                    optional path routes through ElevenLabs for clearer Nigerian-language pronunciation
+                    when the user enables it.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Pronunciation guides</strong> are produced for
+                    every Nigerian-language output, providing IPA notation, an approximate English-friendly
+                    phonetic spelling, syllable separation, tone markers, and pronunciation tips.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Sign language animation</strong> resolves first
+                    against the local NSL dictionary for instant, linguistically reviewed gestures, and
+                    falls back to AI-generated gesture data for any phrase the dictionary does not cover.
+                    Both Nigerian Sign Language (NSL) and American Sign Language (ASL) outputs are
+                    supported, rendered through an SVG avatar with hand shapes, body and head movement,
+                    and facial-expression cues.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Floating avatar</strong> can be detached from
+                    the translation panel and dragged anywhere on the screen, staying synchronised with
+                    audio playback through a shared React context so users can keep the signer visible
+                    while they continue typing or scrolling.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Phrase library</strong> exposes the local
+                    curated phrase set as a searchable, category-filtered reference page with one-click
+                    playback for any supported language.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Accessibility</strong> features include a
+                    full-document dark/light theme, responsive layouts down to 320 px, a bottom mobile
+                    navigation bar with thumb-reachable targets, focus-visible keyboard navigation, and
+                    aria-aware Radix UI primitives.
+                  </li>
                 </ol>
-                <p><strong className="text-foreground">Performance Metrics:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Average translation response time: 1.5-3 seconds</li>
-                  <li>Sign language generation time: 2-4 seconds</li>
-                  <li>First contentful paint: &lt;1 second</li>
-                  <li>Lighthouse accessibility score: 95+</li>
-                </ul>
+                <p>
+                  Observed performance on the local Windows build: cold first-contentful-paint under one
+                  second on the Vite dev server, phrase-library translations returning in &lt; 50 ms,
+                  AI-backed translations completing in roughly 1.5 &ndash; 3 seconds, and sign-language
+                  resolution effectively instant for dictionary hits and 2 &ndash; 4 seconds for the AI
+                  fallback.
+                </p>
               </CardContent>
             </Card>
 
-            {/* 4.8 Sample Outputs */}
+            {/* 4.2 Sample Outputs */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">4.8 Sample Outputs</CardTitle>
+                <CardTitle className="text-lg">4.2 Sample Outputs</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">Sample Translation Output (English to Igbo):</strong></p>
+                <p>
+                  This section walks through the principal output interfaces of NaijaTTS, describing
+                  what each one displays and the role it plays in the user's workflow. The figures
+                  referenced below correspond to the live screens of the running application.
+                </p>
+
+                <p><strong className="text-foreground">Figure 4.2.1 &mdash; Translation Workspace</strong></p>
+                <p>
+                  The main route ([TranslatePage.tsx](src/pages/TranslatePage.tsx)) presents a two-pane
+                  workspace. The left pane is a source-text area with a microphone button for voice
+                  input; the right pane shows the translated text with copy, speak, and pronunciation
+                  controls. Above the panes sits the bidirectional language selector with a swap
+                  button. A live status pill at the top of the page reads "Real-time AI Translation"
+                  when translating from English, and switches to "Voice-first Translation" when a
+                  Nigerian language is the source &mdash; cueing the user to use the microphone.
+                </p>
                 <div className="bg-muted p-4 rounded-lg">
-                  <p><strong>Input:</strong> "Good morning, how are you?"</p>
-                  <p><strong>Translation:</strong> "Ụtụtụ ọma, kedu ka ị mere?"</p>
-                  <p><strong>Pronunciation:</strong> "oo-TOO-too OH-mah, KEH-doo kah ee MEH-reh?"</p>
+                  <p><strong>Input (English):</strong> "Good morning, how are you?"</p>
+                  <p><strong>Translation (Igbo):</strong> "Ụtụtụ ọma, kedu ka ị mere?"</p>
+                  <p><strong>Translation (Hausa):</strong> "Ina kwana, yaya kake?"</p>
+                  <p><strong>Translation (Yoruba):</strong> "Ẹ káàárọ̀, báwo ni?"</p>
+                  <p><strong>Translation (Ikwere):</strong> "Ụtụtụ ọma, kedụ ka ị mere?"</p>
+                  <p className="text-xs italic mt-2">Source: phrase-library hit (instant, no network call).</p>
                 </div>
-                <p><strong className="text-foreground">Sample Sign Language Output:</strong></p>
+
+                <p><strong className="text-foreground">Figure 4.2.2 &mdash; Language Selector</strong></p>
+                <p>
+                  The [LanguageSelector.tsx](src/components/LanguageSelector.tsx) component renders
+                  English alongside the four Nigerian languages as selectable chips for both the source
+                  and target. Selecting a language that is already chosen on the opposite side triggers
+                  an automatic swap, which prevents the invalid "same source and target" state. A
+                  dedicated swap button reverses the direction in a single tap.
+                </p>
+
+                <p><strong className="text-foreground">Figure 4.2.3 &mdash; Pronunciation Guide</strong></p>
+                <p>
+                  When the target is a Nigerian language, [PronunciationGuide.tsx](src/components/PronunciationGuide.tsx)
+                  expands underneath the translated output and presents four labelled fields: an IPA
+                  transcription, an English-friendly phonetic spelling, the word broken into syllables,
+                  and a tone-marker line that highlights high/low/falling tones critical to Igbo and
+                  Yoruba meaning. Below those fields, a short bulleted list of pronunciation tips is
+                  rendered.
+                </p>
+                <div className="bg-muted p-4 rounded-lg">
+                  <p><strong>Word:</strong> "Nnọọ" (Igbo, "Welcome")</p>
+                  <p><strong>IPA:</strong> /n̩.nɔ̃ː/</p>
+                  <p><strong>Phonetic:</strong> "n-NAW-aw"</p>
+                  <p><strong>Syllables:</strong> Nn-ọọ</p>
+                  <p><strong>Tone:</strong> low &mdash; low (sustained)</p>
+                </div>
+
+                <p><strong className="text-foreground">Figure 4.2.4 &mdash; Voice Input</strong></p>
+                <p>
+                  [VoiceInputButton.tsx](src/components/VoiceInputButton.tsx) renders a microphone
+                  button that pulses while listening. Interim transcription is displayed in real time
+                  beneath the input area so the user can confirm what was captured before the final
+                  transcript replaces the source text and translation kicks off automatically.
+                </p>
+
+                <p><strong className="text-foreground">Figure 4.2.5 &mdash; Sign Language Avatar</strong></p>
+                <p>
+                  [SignLanguagePanel.tsx](src/components/SignLanguagePanel.tsx) exposes an NSL/ASL
+                  toggle, a "Generate Sign Language Animation" button, and the rendered avatar from
+                  [SignLanguageAvatar.tsx](src/components/SignLanguageAvatar.tsx). The avatar is a 2D
+                  SVG figure driven by the gesture descriptor below; each sign sequences a hand shape,
+                  a start- and end-position pair, an optional non-dominant hand, a body movement, and a
+                  facial expression. Playback controls let the user pause, replay, slow down, or pop the
+                  avatar out as a draggable floating overlay via
+                  [FloatingAvatar.tsx](src/components/FloatingAvatar.tsx). The
+                  [useAvatarRecorder.ts](src/hooks/useAvatarRecorder.ts) hook can capture a playback as
+                  an animated GIF using <code>gif.js</code> and <code>html2canvas</code>.
+                </p>
                 <div className="bg-muted p-4 rounded-lg">
                   <pre className="text-xs overflow-x-auto">
 {`{
   "signs": [
     {
-      "word": "good",
-      "gloss": "GOOD",
-      "handShape": "flat_hand",
+      "word": "hello",
+      "gloss": "HELLO",
+      "handShape": "open_5",
       "dominantHand": {
-        "startPosition": { "x": 0, "y": 0.3 },
-        "endPosition": { "x": 0.2, "y": 0 },
+        "startPosition": { "x": 0.3, "y": 0.8 },
+        "endPosition":   { "x": 0.5, "y": 0.6 },
         "rotation": 0
       },
+      "nonDominantHand": null,
+      "movement": "wave_side",
+      "bodyMovement": "head_nod",
       "facialExpression": "smile",
       "duration": 800
-    },
-    ...
-  ]
+    }
+  ],
+  "totalDuration": 800
 }`}
                   </pre>
+                  <p className="text-xs italic mt-2">Source: local NSL dictionary
+                  ([src/data/nslDictionary.ts](src/data/nslDictionary.ts)).</p>
                 </div>
+
+                <p><strong className="text-foreground">Figure 4.2.6 &mdash; Phrase Library</strong></p>
+                <p>
+                  The phrase library page ([PhrasesPage.tsx](src/pages/PhrasesPage.tsx)) lists curated
+                  phrases grouped by category (greetings, common, questions, responses, numbers, time,
+                  travel, food, family, emergencies) and difficulty (beginner, intermediate, advanced).
+                  A search box filters across English and all four Nigerian translations simultaneously,
+                  and a speaker icon next to each translation plays the phrase aloud through the
+                  browser's TTS voice for that language.
+                </p>
+
+                <p><strong className="text-foreground">Figure 4.2.7 &mdash; Theme &amp; Responsive Layout</strong></p>
+                <p>
+                  [ThemeToggle.tsx](src/components/ThemeToggle.tsx) and the
+                  [ThemeProvider.tsx](src/components/ThemeProvider.tsx) wrapper expose a light/dark
+                  toggle that persists across sessions through <code>next-themes</code>. The layout
+                  collapses gracefully: desktop shows a top navigation bar; mobile renders a fixed
+                  bottom navigation bar through [Layout.tsx](src/components/Layout.tsx) so that all
+                  primary actions remain thumb-reachable.
+                </p>
               </CardContent>
             </Card>
 
-            {/* 4.9 System Setup */}
+            {/* 4.3 System Setup */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">4.9 System Setup: How to Run the Software</CardTitle>
+                <CardTitle className="text-lg">4.3 System Setup (How to Run the Software)</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">Prerequisites:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Node.js 18.x or higher</li>
-                  <li>npm or yarn package manager</li>
-                  <li>Modern web browser (Chrome, Firefox, Safari, Edge)</li>
-                  <li>Internet connection for API access</li>
+                <p>
+                  NaijaTTS runs as a local web application on the developer's machine. It does not
+                  require deployment to any cloud platform to be exercised in full &mdash; the Vite
+                  development server hosts the frontend and the application calls the configured
+                  Supabase Edge Functions directly from the browser. The procedure below mirrors how
+                  the system was set up and run on the Windows 11 development machine used throughout
+                  this project.
+                </p>
+
+                <p><strong className="text-foreground">Hardware Requirements (minimum)</strong></p>
+                <ul className="list-disc pl-6 space-y-1">
+                  <li>Processor: any modern x64 CPU (1 GHz or faster)</li>
+                  <li>Memory: 4 GB RAM (8 GB recommended for comfortable dev-server use)</li>
+                  <li>Storage: 500 MB free for the project and its <code>node_modules</code> tree</li>
+                  <li>Display: 320 px minimum width (mobile) through to standard desktop resolutions</li>
+                  <li>Microphone: required for the voice-input feature</li>
+                  <li>Speakers or headphones: required to hear text-to-speech output</li>
+                  <li>Network: required during <code>npm install</code> and for live AI translation
+                  requests</li>
                 </ul>
-                <p><strong className="text-foreground">Installation Steps:</strong></p>
+
+                <p><strong className="text-foreground">Software Requirements</strong></p>
+                <ul className="list-disc pl-6 space-y-1">
+                  <li>Operating System: Windows 10 or Windows 11 (the system was developed on
+                  Windows 11; the project also runs on macOS or Linux without changes, but Windows is
+                  the verified platform)</li>
+                  <li>Node.js: version 18.x LTS or higher (includes npm)</li>
+                  <li>Git: any recent version for cloning the repository</li>
+                  <li>Modern browser: Chrome 90+, Edge 90+, Firefox 88+, or Safari 14+ &mdash; required
+                  for the Web Speech API used by both speech recognition and synthesis</li>
+                  <li>Visual Studio Code (recommended IDE; not required to run the software)</li>
+                </ul>
+
+                <p><strong className="text-foreground">Installation and Run Steps (Windows)</strong></p>
+                <p>
+                  Open Windows PowerShell or Windows Terminal, navigate to a working directory of your
+                  choice, and run the commands below in order:
+                </p>
                 <div className="bg-muted p-4 rounded-lg">
                   <pre className="text-xs overflow-x-auto">
-{`# Clone the repository
-git clone https://github.com/[repository-url]
+{`# 1. Clone the project source code
+git clone <repository-url> naijatts
 
-# Navigate to project directory
+# 2. Move into the project folder
 cd naijatts
 
-# Install dependencies
+# 3. Install all dependencies declared in package.json
 npm install
 
-# Start development server
+# 4. Configure environment variables
+#    Copy or create a .env file in the project root with the two
+#    variables the frontend hooks read at runtime:
+#      VITE_SUPABASE_URL=<your-supabase-project-url>
+#      VITE_SUPABASE_PUBLISHABLE_KEY=<your-supabase-anon-key>
+
+# 5. Start the Vite development server
 npm run dev
 
-# Open browser to http://localhost:5173`}
+# 6. Open the application
+#    Vite will print "Local: http://localhost:5173"
+#    Open that URL in Chrome, Edge, or Firefox.
+
+# Optional commands
+npm run build         # Produce an optimised production bundle in dist/
+npm run preview       # Serve the production bundle locally for inspection
+npm run lint          # Run ESLint across the project
+npm run test          # Execute the Vitest test suite once`}
+                  </pre>
+                </div>
+
+                <p><strong className="text-foreground">First-Run Permissions</strong></p>
+                <p>
+                  On first use the browser will prompt for microphone access &mdash; this is required
+                  by the voice-input feature and must be allowed for that workflow to function. Audio
+                  playback (TTS) does not require any browser permission. Some browsers ship the
+                  speech-recognition voices on demand, so the initial Nigerian-language voice may take
+                  a few seconds to become available on the first attempt.
+                </p>
+
+                <p><strong className="text-foreground">Project Layout (where to look)</strong></p>
+                <div className="bg-muted p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+{`naijatts/
+├── public/                       Static assets served as-is
+├── src/
+│   ├── components/               UI components (translation panel, avatar, etc.)
+│   │   └── ui/                   shadcn/ui primitives
+│   ├── contexts/                 React context providers
+│   ├── data/                     Phrase library, NSL dictionary, avatar data
+│   ├── hooks/                    Translation, speech, pronunciation, sign hooks
+│   ├── integrations/supabase/    Supabase client used by the edge-function calls
+│   ├── lib/                      Small utilities (cn, etc.)
+│   ├── pages/                    Translate, Phrases, About, Documentation, NotFound
+│   ├── test/                     Vitest setup and example test
+│   ├── App.tsx                   Root router and providers
+│   ├── index.css                 Global Tailwind styles and design tokens
+│   └── main.tsx                  Application entry point
+├── index.html                    Vite HTML entry
+├── package.json                  Scripts and dependencies
+├── tailwind.config.ts            Tailwind configuration
+├── tsconfig.*.json               TypeScript configuration
+├── vite.config.ts                Vite build configuration
+└── vitest.config.ts              Vitest test configuration`}
                   </pre>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 4.10 System Requirements */}
+            {/* 4.4 Reasons for Choice of Platform/Programming Language */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">4.10 System Requirements</CardTitle>
+                <CardTitle className="text-lg">4.4 Reasons for Choice of Platform and Programming Language</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">Minimum Hardware Requirements:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Processor: 1 GHz or faster</li>
-                  <li>RAM: 2 GB minimum</li>
-                  <li>Storage: 100 MB available space</li>
-                  <li>Display: 320px minimum width</li>
-                  <li>Internet: 1 Mbps connection</li>
-                </ul>
-                <p><strong className="text-foreground">Software Requirements:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Operating System: Any with modern browser support</li>
-                  <li>Browser: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</li>
-                  <li>JavaScript: Enabled</li>
-                  <li>Microphone access: Required for voice input</li>
-                </ul>
+                <p>
+                  The development platform chosen for this work was Windows 11 with Node.js 18 LTS and
+                  Visual Studio Code, because Windows is the most widely used desktop operating system
+                  among Nigerian undergraduate developers and offered the most direct path to a
+                  reproducible environment for the project's intended audience. The browser was chosen
+                  as the runtime target because it is the only consumer platform that ships
+                  speech-recognition, speech-synthesis, vector rendering, and a responsive UI layer
+                  out-of-the-box on every device a Nigerian user is likely to own &mdash; from a budget
+                  Android phone to a shared lab desktop &mdash; without requiring any installation or
+                  app-store gatekeeping, which is important for an accessibility-oriented tool.
+                </p>
+                <p>
+                  TypeScript on top of React 18 was selected as the programming stack because React's
+                  component model maps cleanly to the system's natural units (translation panel,
+                  pronunciation guide, sign-language avatar, phrase card), and TypeScript's static type
+                  system caught a class of bugs early &mdash; particularly around the structured gesture
+                  data, the language enum, and the speech-API event shapes &mdash; that would have been
+                  difficult to detect at runtime. The supporting choices flowed from this base: Vite for
+                  near-instant local builds and hot-module reloading on Windows; Tailwind CSS and
+                  shadcn/ui for a consistent, accessible design system; Framer Motion for the page and
+                  avatar transitions; and Supabase Edge Functions as a thin, serverless boundary in
+                  front of the AI language model so that API credentials never reach the browser.
+                </p>
               </CardContent>
             </Card>
 
-            {/* 4.11 Dependencies and Libraries */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.11 Dependencies and Libraries</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">Core Dependencies:</strong></p>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li><code>react ^18.3.1</code> - UI library</li>
-                  <li><code>react-dom ^18.3.1</code> - React DOM renderer</li>
-                  <li><code>react-router-dom ^6.30.1</code> - Client-side routing</li>
-                  <li><code>@tanstack/react-query ^5.83.0</code> - Server state management</li>
-                  <li><code>@supabase/supabase-js ^2.93.1</code> - Backend client</li>
-                </ul>
-                <p><strong className="text-foreground">UI Dependencies:</strong></p>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li><code>framer-motion ^12.29.2</code> - Animation library</li>
-                  <li><code>tailwindcss-animate ^1.0.7</code> - CSS animations</li>
-                  <li><code>lucide-react ^0.462.0</code> - Icon library</li>
-                  <li><code>next-themes ^0.3.0</code> - Theme management</li>
-                  <li>Various @radix-ui packages - Accessible UI primitives</li>
-                </ul>
-                <p><strong className="text-foreground">Development Dependencies:</strong></p>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li><code>typescript</code> - Type checking</li>
-                  <li><code>vite</code> - Build tool</li>
-                  <li><code>eslint</code> - Code linting</li>
-                  <li><code>vitest</code> - Testing framework</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* 4.12 Reasons for Choice */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">4.12 Reasons for Choice of Platform and Programming Language</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p><strong className="text-foreground">React.js:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Component-based architecture promotes code reusability and maintainability</li>
-                  <li>Large ecosystem of libraries and tools</li>
-                  <li>Strong TypeScript support for type safety</li>
-                  <li>Efficient virtual DOM for performant UI updates</li>
-                </ul>
-                <p><strong className="text-foreground">TypeScript:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Static typing catches errors at compile time</li>
-                  <li>Improved IDE support with autocompletion and refactoring</li>
-                  <li>Self-documenting code through type definitions</li>
-                  <li>Easier maintenance of large codebases</li>
-                </ul>
-                <p><strong className="text-foreground">Supabase Edge Functions:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Serverless architecture eliminates server management overhead</li>
-                  <li>Edge deployment provides low-latency responses globally</li>
-                  <li>Secure environment variable handling for API keys</li>
-                  <li>Seamless integration with Supabase services</li>
-                </ul>
-                <p><strong className="text-foreground">Gemini API:</strong></p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Strong multilingual capabilities including Nigerian languages</li>
-                  <li>Fast response times suitable for real-time applications</li>
-                  <li>Flexible prompt-based interaction model</li>
-                  <li>Continuous model improvements from Google</li>
-                </ul>
-              </CardContent>
-            </Card>
           </div>
         </motion.div>
       </section>
