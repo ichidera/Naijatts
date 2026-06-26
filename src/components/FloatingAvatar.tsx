@@ -65,10 +65,10 @@ export function FloatingAvatar() {
             style={{ touchAction: "none" }}
           >
             <div className={cn(
-              "rounded-2xl border border-border/50 overflow-hidden",
+              "rounded-2xl border border-border/50 overflow-visible",
               "bg-card/95 backdrop-blur-xl shadow-elevated",
               "transition-all duration-300",
-              isMinimized ? "w-16 h-16" : "w-52 md:w-64",
+              isMinimized ? "w-16 h-16" : "w-56 md:w-72",
               isRecording && "ring-2 ring-destructive/60 ring-offset-2 ring-offset-background"
             )}>
               {/* Header bar */}
@@ -151,7 +151,7 @@ export function FloatingAvatar() {
                       signData={signData}
                       isPlaying={isPlaying}
                       onPlayComplete={handlePlayComplete}
-                      size="md"
+                      size="sm"
                     />
                   </div>
 

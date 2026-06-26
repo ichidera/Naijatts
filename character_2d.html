@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>2D Character — Naijatts</title>
+  <style>
+    :root{--bg:#f6fbff;--skin:#ffd8b3;--hair:#3a2f2f;--accent:#ff6b6b}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#eaf5ff);font-family:Inter,system-ui,Arial}
+    .stage{height:100%;display:grid;place-items:center}
+    svg{width:420px;height:auto;display:block}
+    .shadow{filter:blur(6px);opacity:.25}
+
+    /* blink animation */
+    @keyframes blink {0%,95%{transform:scaleY(1)} 97%,100%{transform:scaleY(0.05)}}
+    .eye-lid{transform-origin:center;animation:blink 6s infinite}
+
+    /* wave animation */
+    @keyframes wave {0%{transform:rotate(0)} 20%{transform:rotate(20deg)} 40%{transform:rotate(-10deg)} 60%{transform:rotate(18deg)} 100%{transform:rotate(0)}}
+    .arm-right{transform-origin:20% 80%;}
+
+    /* idle bob */
+    @keyframes bob {0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    .character{animation:bob 3.2s ease-in-out infinite}
+
+    /* simple controls hint */
+    .hint{position:fixed;left:12px;bottom:12px;background:#fff8;border:1px solid #e2e8f0;padding:8px 10px;border-radius:6px;font-size:13px;color:#334155}
+    button.control{background:var(--accent);color:white;border:none;padding:8px 10px;border-radius:6px;margin-left:8px;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-label="2D character">
+      <!-- ground shadow -->
+      <ellipse class="shadow" cx="150" cy="265" rx="70" ry="12" fill="#0b1220" opacity="0.06"/>
+
+      <g class="character" id="char">
+        <!-- body -->
+        <g id="body">
+          <ellipse cx="150" cy="210" rx="60" ry="40" fill="#8ecae6"/>
+        </g>
+
+        <!-- head group -->
+        <g id="head">
+          <circle cx="150" cy="120" r="56" fill="var(--skin)" stroke="#e6b98a" stroke-width="1"/>
+
+          <!-- hair -->
+          <path d="M110 100 C130 70,170 70,190 100 C178 92,160 88,150 88 C140 88,122 95,110 100 Z" fill="var(--hair)"/>
+
+          <!-- left eye -->
+          <g transform="translate(125,115)">
+            <ellipse cx="0" cy="0" rx="10" ry="6" fill="white"/>
+            <circle cx="0" cy="0" r="3.5" fill="#1b1f3a"/>
+            <rect class="eye-lid" x="-11" y="-6" width="22" height="12" rx="6" fill="var(--skin)"/>
+          </g>
+
+          <!-- right eye -->
+          <g transform="translate(175,115)">
+            <ellipse cx="0" cy="0" rx="10" ry="6" fill="white"/>
+            <circle cx="0" cy="0" r="3.5" fill="#1b1f3a"/>
+            <rect class="eye-lid" x="-11" y="-6" width="22" height="12" rx="6" fill="var(--skin)"/>
+          </g>
+
+          <!-- mouth (changes) -->
+          <g id="mouth" transform="translate(150,145)">
+            <path id="mouthPath" d="M -12 2 Q 0 12 12 2" stroke="#8b3d3d" stroke-width="3" fill="transparent" stroke-linecap="round"/>
+          </g>
+
+          <!-- blush -->
+          <ellipse cx="130" cy="140" rx="6" ry="4" fill="#ffb2b2" opacity="0.9"/>
+          <ellipse cx="170" cy="140" rx="6" ry="4" fill="#ffb2b2" opacity="0.9"/>
+        </g>
+
+        <!-- left arm (idle) -->
+        <g id="arm-left" transform="translate(95,175)">
+          <path d="M0 0 C -20 -5, -30 10, -8 18" stroke="#ffd8b3" stroke-width="12" stroke-linecap="round" fill="none"/>
+        </g>
+
+        <!-- right arm (will wave) -->
+        <g id="arm-right" transform="translate(205,160)" class="arm-right">
+          <path d="M0 0 C 18 -8, 32 12, 12 28" stroke="#ffd8b3" stroke-width="12" stroke-linecap="round" fill="none"/>
+          <circle cx="12" cy="28" r="6" fill="var(--skin)"/>
+        </g>
+
+      </g>
+    </svg>
+  </div>
+
+  <div class="hint">Click the character to toggle mouth; <button class="control" id="waveBtn">Wave</button></div>
+
+  <script>
+    const mouthPath = document.getElementById('mouthPath');
+    let smiling = true;
+    document.getElementById('char').addEventListener('click', () => {
+      if (smiling) {
+        // change to surprised / open mouth
+        mouthPath.setAttribute('d','M -6 2 Q 0 18 6 2 Q 0 22 -6 2 Z');
+        mouthPath.setAttribute('fill','#8b3d3d');
+      } else {
+        mouthPath.setAttribute('d','M -12 2 Q 0 12 12 2');
+        mouthPath.setAttribute('fill','transparent');
+      }
+      smiling = !smiling;
+    });
+
+    // wave control
+    const arm = document.getElementById('arm-right');
+    const waveBtn = document.getElementById('waveBtn');
+    waveBtn.addEventListener('click', () => {
+      arm.style.animation = 'wave 1.2s ease-in-out 0s 3';
+      // clear animation after done so it can be retriggered
+      setTimeout(() => arm.style.animation = '', 3700);
+    });
+
+    // random blink offsets so character feels alive
+    const lids = document.querySelectorAll('.eye-lid');
+    lids.forEach((l,i)=>{
+      l.style.animationDelay = (Math.random()*3)+'s';
+    });
+  </script>
+</body>
+</html>
