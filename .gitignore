@@ -82,3 +82,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Executables
+*.exe
