@@ -75,8 +75,12 @@ export function TranslationPanel({
     if (result.translation) {
       setTranslatedText(result.translation);
       setTranslationSource(result.source ?? null);
-    } else if (result.error) {
-      toast.error("Translation failed", { description: result.error });
+    } else {
+      setTranslatedText("");
+      setTranslationSource(null);
+      if (result.error) {
+        toast.error("Translation failed", { description: result.error });
+      }
     }
   }, []);
 
@@ -98,10 +102,14 @@ export function TranslationPanel({
     if (result.translation) {
       setTranslatedText(result.translation);
       setTranslationSource(result.source ?? null);
-    } else if (result.error) {
-      toast.error("Translation failed", {
-        description: result.error,
-      });
+    } else {
+      setTranslatedText("");
+      setTranslationSource(null);
+      if (result.error) {
+        toast.error("Translation failed", {
+          description: result.error,
+        });
+      }
     }
   };
 

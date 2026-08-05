@@ -10,6 +10,71 @@ export interface TranslationResult {
 type NigerianLang = keyof (typeof phraseLibrary)[0]["translations"];
 const NIGERIAN_LANGUAGES = new Set<string>(["Igbo", "Hausa", "Yoruba", "Ikwere"]);
 
+const SUPABASE_FUNCTION_BASE = import.meta.env.VITE_SUPABASE_URL?.replace(/\/+$/, "") ?? "";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const hasSupabaseConfig = Boolean(SUPABASE_FUNCTION_BASE && SUPABASE_PUBLISHABLE_KEY);
+
+function lookupPhraseLibraryExactWord(
+  text: string,
+  sourceLanguage: string,
+  targetLanguage: string
+): string | null {
+  const normalized = text.trim().toLowerCase().replace(/[?.!,;]+$/, "");
+  if (!normalized) return null;
+
+  const isSourceEnglish = sourceLanguage === "English";
+  const isTargetEnglish = targetLanguage === "English";
+
+  if (isSourceEnglish) {
+    const lang = targetLanguage as NigerianLang;
+    for (const phrase of phraseLibrary) {
+      const phraseNorm = phrase.english.toLowerCase().replace(/[?.!,;]+$/, "");
+      if (phraseNorm === normalized) {
+        return phrase.translations[lang] ?? null;
+      }
+    }
+  } else if (isTargetEnglish) {
+    const srcLang = sourceLanguage as NigerianLang;
+    for (const phrase of phraseLibrary) {
+      const phraseText = phrase.translations[srcLang];
+      if (!phraseText) continue;
+      const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
+      if (phraseNorm === normalized) {
+        return phrase.english;
+      }
+    }
+  } else if (NIGERIAN_LANGUAGES.has(sourceLanguage) && NIGERIAN_LANGUAGES.has(targetLanguage)) {
+    const srcLang = sourceLanguage as NigerianLang;
+    const tgtLang = targetLanguage as NigerianLang;
+    for (const phrase of phraseLibrary) {
+      const phraseText = phrase.translations[srcLang];
+      if (!phraseText) continue;
+      const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
+      if (phraseNorm === normalized) {
+        return phrase.translations[tgtLang] ?? null;
+      }
+    }
+  }
+
+  return null;
+}
+
+function fallbackWordTranslation(
+  text: string,
+  sourceLanguage: string,
+  targetLanguage: string
+): string | null {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return null;
+
+  const translatedWords = words.map((word) => lookupPhraseLibraryExactWord(word, sourceLanguage, targetLanguage));
+  if (translatedWords.some((translated) => translated === null)) {
+    return null;
+  }
+
+  return translatedWords.join(" ");
+}
+
 /**
  * Bidirectional phrase library lookup.
  * English → Nigerian:  matches against phrase.english
@@ -36,15 +101,6 @@ function lookupPhraseLibrary(
         return phrase.translations[lang] ?? null;
       }
     }
-    // Prefix match for partial typing
-    if (normalized.length >= 3) {
-      for (const phrase of phraseLibrary) {
-        const phraseNorm = phrase.english.toLowerCase().replace(/[?.!,;]+$/, "");
-        if (phraseNorm.startsWith(normalized)) {
-          return phrase.translations[lang] ?? null;
-        }
-      }
-    }
   } else if (isTargetEnglish) {
     // Nigerian → English
     const srcLang = sourceLanguage as NigerianLang;
@@ -54,17 +110,6 @@ function lookupPhraseLibrary(
       const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
       if (phraseNorm === normalized) {
         return phrase.english;
-      }
-    }
-    // Prefix match for partial typing
-    if (normalized.length >= 2) {
-      for (const phrase of phraseLibrary) {
-        const phraseText = phrase.translations[srcLang];
-        if (!phraseText) continue;
-        const phraseNorm = phraseText.toLowerCase().replace(/[?.!,;]+$/, "");
-        if (phraseNorm.startsWith(normalized)) {
-          return phrase.english;
-        }
       }
     }
   } else if (NIGERIAN_LANGUAGES.has(sourceLanguage) && NIGERIAN_LANGUAGES.has(targetLanguage)) {
@@ -114,6 +159,17 @@ export function useTranslation() {
       return { translation: libraryMatch, source: "phrase-library" };
     }
 
+    // Try a local word-by-word fallback when the Supabase function isn't configured.
+    if (!hasSupabaseConfig) {
+      const fallback = fallbackWordTranslation(text, sourceLanguage, targetLanguage);
+      if (fallback) {
+        return { translation: fallback, source: "phrase-library" };
+      }
+      const errorMessage = "Translation service is not configured.";
+      setError(errorMessage);
+      return { translation: "", error: errorMessage };
+    }
+
     // Cancel previous in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -124,12 +180,12 @@ export function useTranslation() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate`,
+        `${SUPABASE_FUNCTION_BASE}/functions/v1/translate`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({ text, sourceLanguage, targetLanguage }),
           signal: controller.signal,
@@ -137,8 +193,15 @@ export function useTranslation() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Translation failed");
+        let message = "Translation failed";
+        try {
+          const errorData = await response.json();
+          message = errorData?.error || message;
+        } catch {
+          const textBody = await response.text();
+          if (textBody) message = textBody;
+        }
+        throw new Error(message);
       }
 
       const data = await response.json();
@@ -147,7 +210,16 @@ export function useTranslation() {
       if ((err as Error).name === "AbortError") {
         return { translation: "" };
       }
-      const errorMessage = err instanceof Error ? err.message : "Translation failed";
+
+      const fallback = fallbackWordTranslation(text, sourceLanguage, targetLanguage);
+      if (fallback) {
+        return { translation: fallback, source: "phrase-library" };
+      }
+
+      let errorMessage = err instanceof Error ? err.message : "Translation failed";
+      if (errorMessage === "Failed to fetch") {
+        errorMessage = "Unable to reach the translation service. Please check your network or Supabase function configuration.";
+      }
       setError(errorMessage);
       return { translation: "", error: errorMessage };
     } finally {
