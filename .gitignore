@@ -1,3 +1,63 @@
+node_modules/
+dist/
+build/
+public/build/
+.vite/
+/.vite
+
+# Vite / TypeScript
+*.tsbuildinfo
+
+# Bun
+bun.lockb
+
+# Environment
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+.nyc_output/
+.c8/
+
+# Tests
+vitest.coverage/
+.vitest/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+env/
+ENV/
+
+# Supabase local
+supabase/.local/
+
+# Supabase functions build directories
+supabase/functions/*/node_modules/
+supabase/functions/*/dist/
+
+# Packaging and archives
+*.zip
+
+# Ignore this helper script
+scripts/zip_project.py
 # Logs
 logs
 *.log
