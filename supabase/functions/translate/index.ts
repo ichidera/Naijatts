@@ -20,6 +20,7 @@ serve(async (req) => {
 
     const isNigerianToEnglish = targetLanguage === "English" && ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(sourceLanguage);
     const isNigerianToNigerian = ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(sourceLanguage) && ["Igbo", "Hausa", "Yoruba", "Ikwere"].includes(targetLanguage);
+    const isIkwereInvolved = sourceLanguage === "Ikwere" || targetLanguage === "Ikwere";
 
     let directionHint = "";
     if (isNigerianToEnglish) {
@@ -38,6 +39,26 @@ IMPORTANT — translating between two Nigerian languages (${sourceLanguage} → 
 10. Both languages may use special characters and diacritical marks — handle them correctly.`;
     }
 
+    // Ikwerre is a distinct, low-resource Igboid language — general-purpose models tend to
+    // default to Igbo vocabulary when unsure, because Igbo dominates their training data and
+    // the two languages are related. This block grounds the model in verified Ikwerre data
+    // (from "Mụnya Ikwere" by S.A. Ekwulo & O.J. Agwmu, and the Ikwerre Language Committee's
+    // standardized decimal counting system) so it stops silently substituting Igbo.
+    let ikwereGrounding = "";
+    if (isIkwereInvolved) {
+      ikwereGrounding = `
+
+IKWERRE-SPECIFIC GROUNDING — read carefully before translating:
+Ikwerre (ISO 639-3: ikw) is spoken in Rivers State, Nigeria (Port Harcourt, Obio-Akpor, Emohua, Ikwerre LGAs). It is a distinct Igboid language, related to Igbo but NOT the same language — it has its own vocabulary and phonology (e.g. it retains an "r" sound Igbo dialects often drop: "rumu" vs. Igbo "umu"). Do not substitute Igbo words for Ikwerre words. Only use a shared/cognate form if you are genuinely confident it is also correct in Ikwerre, not merely because it is the Igbo word.
+
+For ANY numbers, use this verified Ikwerre numeral system (the Ikwerre Language Committee's standardized decimal counting system) — do not use Igbo numerals for these:
+0 etekne · 1 otu · 2 ẹbo · 3 ẹto · 4 ẹno · 5 isne · 6 isunu · 7 ẹsawu · 8 ẹsato · 9 tolu · 10 nri · 20 nri lawụru · 30 nri ẹto · 40 nri ẹno · 50 nri isne · 100 otu pokwu · 1,000 otu riwhu · 1,000,000 otu ndasi · 1,000,000,000 otu nde · 1,000,000,000,000 otu pokwu nde.
+Compound numbers follow a "[tens/hundreds/etc.] nụ [remainder]" pattern, e.g. 21 = "nri lawụru nụ otu" (twenty and one).
+The Igbo numerals Abụọ, Atọ, Anọ, Ise, Isii, Asaa, Asatọ, Itoolu, Iri, Narị and Puku are NOT Ikwerre — do not use them for an Ikwerre translation, even though "otu" (one) happens to be shared between the two languages.
+
+For Ikwerre vocabulary outside of numbers, translate carefully and conservatively — prefer a simpler, more literal rendering you are reasonably confident about over a fluent-sounding guess, since incorrect "confident" Ikwerre is worse than a plainer correct one.`;
+    }
+
     const systemPrompt = `You are an expert translator specializing in Nigerian languages: Igbo, Hausa, Yoruba, and Ikwere.
 Translate text accurately, preserving cultural nuances, tone, and intent.
 
@@ -48,7 +69,7 @@ Rules:
 4. For partial or incomplete sentences, translate what is given naturally.
 5. If the input is a single word, translate that word directly.
 6. Maintain the register and formality level of the source text.
-7. For idiomatic expressions, translate the meaning rather than word-for-word.${directionHint}`;
+7. For idiomatic expressions, translate the meaning rather than word-for-word.${directionHint}${ikwereGrounding}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

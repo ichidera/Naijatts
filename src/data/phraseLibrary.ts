@@ -268,7 +268,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Otu",
       Hausa: "Ɗaya",
       Yoruba: "Ọ̀kan",
-      Ikwere: "Otu",
+      Ikwere: "Otu", // Mụnya Ikwere (Ekwulo & Agwmu, Ikwerre Language Committee decimal system) — matches Igbo here
     },
     category: "numbers",
     difficulty: "beginner",
@@ -280,7 +280,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Abụọ",
       Hausa: "Biyu",
       Yoruba: "Èjì",
-      Ikwere: "Abụọ",
+      Ikwere: "Ẹbo", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -292,7 +292,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Atọ",
       Hausa: "Uku",
       Yoruba: "Ẹ̀ta",
-      Ikwere: "Atọ",
+      Ikwere: "Ẹto", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -304,7 +304,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Iri",
       Hausa: "Goma",
       Yoruba: "Ẹ̀wá",
-      Ikwere: "Iri",
+      Ikwere: "Nri", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -724,7 +724,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Anọ",
       Hausa: "Huɗu",
       Yoruba: "Ẹ̀rin",
-      Ikwere: "Anọ",
+      Ikwere: "Ẹno", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -736,7 +736,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Ise",
       Hausa: "Biyar",
       Yoruba: "Àrún",
-      Ikwere: "Ise",
+      Ikwere: "Isne", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -748,7 +748,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Isii",
       Hausa: "Shida",
       Yoruba: "Ẹ̀fà",
-      Ikwere: "Isii",
+      Ikwere: "Isunu", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -760,7 +760,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Asaa",
       Hausa: "Bakwai",
       Yoruba: "Èje",
-      Ikwere: "Asaa",
+      Ikwere: "Ẹsawu", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -772,7 +772,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Asatọ",
       Hausa: "Takwas",
       Yoruba: "Ẹ̀jọ",
-      Ikwere: "Asatọ",
+      Ikwere: "Ẹsato", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -784,7 +784,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Itoolu",
       Hausa: "Tara",
       Yoruba: "Ẹ̀sán",
-      Ikwere: "Itoolu",
+      Ikwere: "Tolu", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "beginner",
@@ -796,7 +796,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Iri abụọ",
       Hausa: "Ashirin",
       Yoruba: "Ogún",
-      Ikwere: "Iri abụọ",
+      Ikwere: "Nri lawụru", // was a straight Igbo copy — corrected from Mụnya Ikwere (its own word, not "10x2")
     },
     category: "numbers",
     difficulty: "intermediate",
@@ -808,7 +808,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Narị",
       Hausa: "Ɗari",
       Yoruba: "Ọgọ́rùn",
-      Ikwere: "Narị",
+      Ikwere: "Otu pokwu", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "intermediate",
@@ -820,7 +820,7 @@ export const phraseLibrary: Phrase[] = [
       Igbo: "Puku",
       Hausa: "Dubu",
       Yoruba: "Ẹgbẹ̀rún",
-      Ikwere: "Puku",
+      Ikwere: "Otu riwhu", // was a straight Igbo copy — corrected from Mụnya Ikwere
     },
     category: "numbers",
     difficulty: "intermediate",
