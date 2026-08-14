@@ -92,6 +92,17 @@ const DEFAULT_SIGN: SignGesture = {
  *   1. For each word, try the NSL dictionary first.
  *   2. Fall back to the deterministic rule-based generator.
  */
+/**
+ * NSL has a curated 98-word lexical dictionary (src/data/nslDictionary.ts).
+ * ASL currently does not — there's no equivalent aslDictionary.ts yet, so
+ * selecting ASL mode always fingerspells, word by word. That's an honest
+ * fallback (real ASL fingerspelling is a real thing signers do), not a bug,
+ * but it does mean ASL mode has no whole-word lexical signs yet. Real,
+ * citable candidate sources for building one properly — not by guessing —
+ * are researched in sign-language-datasets.md: ASL-LEX (github.com/ASL-LEX/asl-lex,
+ * ~2,723 signs with linguist-coded phonology) and ASL Citizen (Microsoft
+ * Research, ~84k consented videos, built with Deaf researchers throughout).
+ */
 function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): SignLanguageData {
   const rawWords = text.toLowerCase().split(/\s+/).filter(Boolean);
   const words = rawWords.filter((w) => !SKIP_WORDS.has(w));
@@ -102,11 +113,18 @@ function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): 
     return { signs: [fallback], note: "Auto-generated gesture" };
   }
 
+  let dictionaryHits = 0;
+  let fingerspelledWords = 0;
+
   const signs: SignGesture[] = words.flatMap((word) => {
-    // 1. Exact dictionary lookup (NSL)
+    // 1. Exact dictionary lookup (NSL). ASL has no lexical dictionary yet —
+    // see the note on generateGestureLocally's signature — so ASL always
+    // falls through to fingerspelling below, which is honest: real ASL
+    // fingerspelling, not a fabricated lexical sign.
     if (signLanguageType === "NSL") {
       const entry = lookupNSL(word);
       if (entry) {
+        dictionaryHits++;
         return [{
           handShape:        entry.handShape,
           dominantHand:     entry.dominantHand,
@@ -122,6 +140,7 @@ function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): 
 
     // 2. Not in the dictionary — fingerspell it, letter by letter, instead
     // of inventing a gesture.
+    fingerspelledWords++;
     return fingerspellWord(word);
   });
 
@@ -129,9 +148,16 @@ function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): 
     signs.reduce((sum, s) => sum + s.duration, 0) +
     Math.max(0, signs.length - 1) * 200;
 
+  const note =
+    fingerspelledWords === 0
+      ? "Dictionary sign" + (dictionaryHits > 1 ? "s" : "")
+      : dictionaryHits === 0
+        ? "Fingerspelled — not in the dictionary"
+        : `${dictionaryHits} dictionary sign${dictionaryHits > 1 ? "s" : ""}, ${fingerspelledWords} fingerspelled`;
+
   return {
     signs,
-    note: "Auto-generated gesture",
+    note,
     // @ts-expect-error — totalDuration is an extra field used by some consumers
     totalDuration,
   };
@@ -153,8 +179,24 @@ export function useSignLanguage(): UseSignLanguageReturn {
   const [error, setError] = useState<string | null>(null);
 
   const getSignLanguage = useCallback(
-    (text: string, _sourceLanguage: string, signType: "NSL" | "ASL" = "NSL") => {
+    (text: string, sourceLanguage: string, signType: "NSL" | "ASL" = "NSL") => {
       if (!text?.trim()) return;
+
+      // Both the NSL dictionary and fingerspelling are keyed to ENGLISH
+      // words/meaning — NSL and ASL are visual-gestural languages with their
+      // own grammar, not letter-for-letter re-encodings of Igbo/Hausa/Yoruba
+      // orthography, and the manual alphabet has no representation for
+      // non-Latin diacritics like ọ/ṣ anyway. If this ever fires, the bug is
+      // upstream: whatever calls getSignLanguage is passing translated
+      // Nigerian-language text instead of the original English. See
+      // TranslationPanel.tsx, which now passes `inputText`, not
+      // `translatedText`, for this exact reason.
+      if (sourceLanguage && sourceLanguage.toLowerCase() !== "english") {
+        console.warn(
+          `useSignLanguage: received "${sourceLanguage}" text ("${text.slice(0, 40)}${text.length > 40 ? "…" : ""}"). ` +
+          `Signing only makes sense from English meaning — check the caller is passing English text, not translated output.`
+        );
+      }
 
       setIsLoading(true);
       setError(null);

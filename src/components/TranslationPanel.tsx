@@ -338,9 +338,21 @@ export function TranslationPanel({
             isLoading={isPronunciationLoading}
           />
           
+          {/*
+            Sign language must run on the ENGLISH side of the translation, not
+            the Nigerian-language output — NSL/ASL are visual-gestural
+            languages with their own grammar, not letter-for-letter
+            re-encodings of Igbo/Hausa/Yoruba text, and fingerspelling has no
+            representation for non-Latin diacritics like ọ/ṣ anyway. This
+            branch renders when targetLanguage is Nigerian, so by this
+            component's English<->Nigerian-language pairing, inputText (what
+            the user actually typed) is the English side — translatedText is
+            not. Getting this backwards is exactly what produced signs like
+            "#ACHỌRỌ" and "#NRI" instead of real English-sourced signs.
+          */}
           <SignLanguagePanel
-            text={translatedText}
-            sourceLanguage={targetLanguage}
+            text={inputText}
+            sourceLanguage={sourceLanguage}
             onSignDataReady={handleSignDataReady}
           />
         </div>
@@ -349,6 +361,8 @@ export function TranslationPanel({
       {/* Sign Language only (no pronunciation) for English output */}
       {translatedText && !showPronunciation && (
         <div className="mt-4">
+          {/* Here targetLanguage is already English, so translatedText IS
+              the English side — this branch was already correct. */}
           <SignLanguagePanel
             text={translatedText}
             sourceLanguage={targetLanguage}
