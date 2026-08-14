@@ -71,6 +71,96 @@ function mapNonDominantAngles(end: HandPosition): { upperAngle: number; forearmA
   return { upperAngle, forearmAngle };
 }
 
+// ─── Fingerspelling (manual alphabet) ─────────────────────────────────────────
+// Static ASL/NSL manual-alphabet handshapes, used as the fallback for any word
+// that isn't in the curated NSL dictionary. Fingerspelling is a real strategy
+// signers use for unfamiliar words and proper names — unlike the old fallback,
+// every entry here is a documented, standardized letter, not an invented sign.
+// J and Z are traditionally drawn with a small MOTION trace rather than a
+// static shape; this renderer has no mid-letter motion path, so they reuse the
+// closest static handshape (I and D) as a known, flagged simplification.
+// curl: 0 = fully extended, 1 = fully curled into the palm. Order: [index, middle, ring, pinky].
+const FINGERSPELL: Record<
+  string,
+  { thumb: number; curl: [number, number, number, number]; spread?: number; thumbAcross?: boolean }
+> = {
+  A: { thumb: 0.15, curl: [1, 1, 1, 1] },
+  B: { thumb: 1, curl: [0, 0, 0, 0], thumbAcross: true },
+  C: { thumb: 0.45, curl: [0.4, 0.4, 0.4, 0.4] },
+  D: { thumb: 0.6, curl: [0, 1, 1, 1] },
+  E: { thumb: 0.85, curl: [0.85, 0.85, 0.85, 0.85] },
+  F: { thumb: 0.5, curl: [0.5, 0, 0, 0] },
+  G: { thumb: 0.15, curl: [0.15, 1, 1, 1] },
+  H: { thumb: 1, curl: [0, 0, 1, 1] },
+  I: { thumb: 1, curl: [1, 1, 1, 0] },
+  J: { thumb: 1, curl: [1, 1, 1, 0] }, // + traced hook motion, not rendered
+  K: { thumb: 0.25, curl: [0, 0, 1, 1], spread: 0.35 },
+  L: { thumb: 0, curl: [0, 1, 1, 1] },
+  M: { thumb: 0.9, curl: [1, 1, 1, 1] },
+  N: { thumb: 0.9, curl: [1, 1, 1, 1] },
+  O: { thumb: 0.5, curl: [0.5, 0.5, 0.5, 0.5] },
+  P: { thumb: 0.25, curl: [0, 0, 1, 1], spread: 0.35 },
+  Q: { thumb: 0.15, curl: [0.15, 1, 1, 1] },
+  R: { thumb: 1, curl: [0, 0, 1, 1], spread: -0.25 },
+  S: { thumb: 1, curl: [1, 1, 1, 1], thumbAcross: true },
+  T: { thumb: 0.7, curl: [1, 1, 1, 1] },
+  U: { thumb: 1, curl: [0, 0, 1, 1] },
+  V: { thumb: 1, curl: [0, 0, 1, 1], spread: 0.5 },
+  W: { thumb: 1, curl: [0, 0, 0, 1], spread: 0.4 },
+  X: { thumb: 1, curl: [0.5, 1, 1, 1] },
+  Y: { thumb: 0, curl: [1, 1, 1, 0] },
+  Z: { thumb: 1, curl: [0, 1, 1, 1] }, // + traced zigzag motion, not rendered
+};
+
+// Draws one fingerspelled letter. Assumes the caller has already translated to
+// the wrist point, rotated, and flipped (same convention as drawHand's cases
+// below) — this only draws the local geometry.
+function drawFingerspellShape(ctx: CanvasRenderingContext2D, letter: string) {
+  const state = FINGERSPELL[letter];
+  if (!state) {
+    // Unrecognized character (digit/symbol) — draw a neutral open palm
+    // rather than guessing. See NO_SIGN_AVAILABLE in useSignLanguage.ts.
+    ctx.beginPath();
+    ctx.roundRect(-9, -4, 18, 14, 3);
+    ctx.fill();
+    ctx.stroke();
+    return;
+  }
+
+  // palm
+  ctx.beginPath();
+  ctx.roundRect(-9, -3, 18, 15, 4);
+  ctx.fill();
+  ctx.stroke();
+
+  // four fingers, index → pinky, left to right
+  const baseX = [-6, -2, 2, 6];
+  const spread = state.spread ?? 0;
+  state.curl.forEach((curl, i) => {
+    const len = 15 * (1 - curl * 0.78);
+    const fan = (i - 1.5) * spread * 3;
+    ctx.save();
+    ctx.translate(baseX[i], -3);
+    ctx.rotate(fan * 0.15);
+    ctx.beginPath();
+    ctx.roundRect(-1.6, -len, 3.2, len, 1.6);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // thumb
+  ctx.save();
+  ctx.translate(-9, 4);
+  ctx.rotate(state.thumbAcross ? 1.1 : -0.6);
+  const thumbLen = 10 * (1 - state.thumb * 0.72);
+  ctx.beginPath();
+  ctx.roundRect(0, -2.5, thumbLen, 5, 2.4);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
 // ─── Hand shape drawing ───────────────────────────────────────────────────────
 // All drawn relative to wrist point (cx=0, cy=0), then translated
 function drawHand(
@@ -89,6 +179,14 @@ function drawHand(
   ctx.fillStyle = SKIN_BASE;
   ctx.strokeStyle = SKIN_SHADOW;
   ctx.lineWidth = 1.2;
+
+  // Fingerspelled letters use a separate parametric renderer (see above)
+  // instead of the per-shape cases below.
+  if (shape.startsWith("fs_")) {
+    drawFingerspellShape(ctx, shape.slice(3).toUpperCase());
+    ctx.restore();
+    return;
+  }
 
   switch (shape) {
     case "fist": {

@@ -779,10 +779,14 @@ export default function DocumentationPage() {
                   implementations remain rare.
                 </p>
                 <p>
-                  This research addresses the absence of NSL synthesis tools by implementing an avatar capable 
-                  of rendering signs based on AI-generated signing instructions. While the avatar employs 
-                  simplified 2D representations rather than photorealistic 3D animation, it provides a 
-                  foundation for accessible sign language output that can be enhanced in future iterations.
+                  This research addresses the absence of NSL synthesis tools by implementing an avatar that 
+                  renders signs from a curated NSL lexicon, falling back to letter-by-letter fingerspelling — 
+                  itself a standard, documented signing strategy — for words outside that lexicon, rather than 
+                  an inferred or approximated gesture. A separate LLM-assisted generation pathway was also 
+                  prototyped during development but is not part of the current rendering path, pending 
+                  validation of its output against real NSL data. While the avatar employs simplified 2D 
+                  representations rather than photorealistic 3D animation, it provides a foundation for 
+                  accessible sign language output that can be enhanced in future iterations.
                 </p>
               </CardContent>
             </Card>

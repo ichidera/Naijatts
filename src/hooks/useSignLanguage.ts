@@ -11,78 +11,64 @@ const SKIP_WORDS = new Set([
   "be", "been", "being", "do", "does", "did", "have", "has", "had",
 ]);
 
-// Hand shape map by first letter
-function letterToHandShape(word: string): string {
-  if (word.length > 8) return "spread";
-  const ch = word[0]?.toLowerCase() ?? "a";
-  if (ch >= "a" && ch <= "e") return "open_5";
-  if (ch >= "f" && ch <= "j") return "flat_hand";
-  if (ch >= "k" && ch <= "o") return "point";
-  if (ch >= "p" && ch <= "t") return "fist";
-  return "c_shape"; // u-z
-}
+/**
+ * Fingerspell a word that isn't in the NSL dictionary, one SignGesture per
+ * letter. This replaces the old charCode-based arbitrary-gesture generator:
+ * fingerspelling is a real, standardized strategy real signers use for
+ * unfamiliar words and proper names, so — unlike the old fallback — this
+ * always produces a real, recognizable letter, never an invented sign.
+ * Non-alphabetic tokens (numbers, symbols) fall through to NO_SIGN_AVAILABLE.
+ */
+function fingerspellWord(word: string): SignGesture[] {
+  const letters = word.replace(/[^a-zA-Z]/g, "").split("");
+  if (letters.length === 0) {
+    return [{ ...NO_SIGN_AVAILABLE, word }];
+  }
 
-// Facial expression based on word semantics
-function wordToExpression(word: string): string {
-  const w = word.toLowerCase();
-  if (["happy", "joy", "love", "great", "good", "nice", "wonderful", "excellent", "best", "beautiful"].includes(w))
-    return "smile";
-  if (["sad", "sorry", "bad", "wrong", "pain", "sick", "hurt", "cry", "poor"].includes(w))
-    return "concerned";
-  if (["what", "where", "who", "why", "how", "when", "which"].includes(w))
-    return "questioning";
-  if (["think", "wonder", "maybe", "perhaps", "probably"].includes(w))
-    return "thinking";
-  if (["stop", "never", "danger", "angry", "hate"].includes(w))
-    return "serious";
-  return "neutral";
-}
-
-// Body movement based on word semantics
-function wordToBodyMovement(word: string): string {
-  const w = word.toLowerCase();
-  if (["yes", "agree", "okay", "ok", "right", "correct", "sure"].includes(w)) return "head_nod";
-  if (["no", "never", "not", "wrong", "disagree"].includes(w)) return "head_shake";
-  return "none";
+  return letters.map((letter, i) => ({
+    handShape: `fs_${letter.toLowerCase()}`,
+    // Fingerspelling is held near shoulder height with no travel — the
+    // motion is in the fingers, not the arm.
+    dominantHand: {
+      startPosition: { x: 0.15, y: 0.1 },
+      endPosition: { x: 0.15, y: 0.1 },
+      rotation: 0,
+    },
+    nonDominantHand: null,
+    bodyMovement: "none",
+    facialExpression: "neutral",
+    duration: 320, // brisk — fingerspelling reads faster than a full lexical sign
+    gloss: i === 0 ? `#${word.toUpperCase()}` : "", // "#WORD" is conventional gloss notation for a fingerspelled word
+    word: i === 0 ? word : "",
+  }));
 }
 
 /**
- * Generate a deterministic SignGesture from any word.
- * No randomness — same word always produces the same gesture.
+ * Shown for tokens with no letters to fingerspell (pure numbers, symbols).
+ * This is an honest "I don't have a sign for that" state — open palms raised
+ * with a questioning expression, a real, natural thing signers do — rather
+ * than a fabricated gesture pretending to be a real sign. Numbers 0–9 have
+ * their own real NSL handshapes and are a reasonable next addition; until
+ * then, this is what un-signable input falls back to.
  */
-function generateGestureForWord(word: string): SignGesture {
-  const code0 = word.charCodeAt(0) || 97;
-  const code1 = word.charCodeAt(1) || 97;
-
-  const endX = (code0 % 5 - 2) * 0.3;                   // -0.6 to 0.6
-  const endY = word.length > 5 ? 0.4 : 0;               // higher for longer words
-  const startX = endX;
-  const startY = endY - 0.2;
-  const rotation = (code1 % 60) - 30;                    // -30 to 30
-  const hasNonDom = word.length > 6;
-  const duration = 800 + word.length * 60;
-
-  return {
-    handShape: letterToHandShape(word),
-    dominantHand: {
-      startPosition: { x: startX, y: startY },
-      endPosition:   { x: endX,   y: endY },
-      rotation,
-    },
-    nonDominantHand: hasNonDom
-      ? {
-          startPosition: { x: -startX, y: startY },
-          endPosition:   { x: -endX,   y: endY },
-          rotation:       -rotation,
-        }
-      : null,
-    bodyMovement:    wordToBodyMovement(word),
-    facialExpression: wordToExpression(word),
-    duration,
-    gloss: word.toUpperCase(),
-    word,
-  };
-}
+const NO_SIGN_AVAILABLE: SignGesture = {
+  word: "",
+  gloss: "(no sign available)",
+  handShape: "spread",
+  dominantHand: {
+    startPosition: { x: 0.35, y: -0.15 },
+    endPosition: { x: 0.35, y: -0.15 },
+    rotation: 15,
+  },
+  nonDominantHand: {
+    startPosition: { x: -0.35, y: -0.15 },
+    endPosition: { x: -0.35, y: -0.15 },
+    rotation: -15,
+  },
+  bodyMovement: "none",
+  facialExpression: "questioning",
+  duration: 650,
+};
 
 /** Fallback single sign when all words are filtered */
 const DEFAULT_SIGN: SignGesture = {
@@ -116,12 +102,12 @@ function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): 
     return { signs: [fallback], note: "Auto-generated gesture" };
   }
 
-  const signs: SignGesture[] = words.map((word) => {
+  const signs: SignGesture[] = words.flatMap((word) => {
     // 1. Exact dictionary lookup (NSL)
     if (signLanguageType === "NSL") {
       const entry = lookupNSL(word);
       if (entry) {
-        return {
+        return [{
           handShape:        entry.handShape,
           dominantHand:     entry.dominantHand,
           nonDominantHand:  entry.nonDominantHand,
@@ -130,12 +116,13 @@ function generateGestureLocally(text: string, signLanguageType: "NSL" | "ASL"): 
           duration:         entry.duration,
           gloss:            entry.gloss,
           word,
-        };
+        }];
       }
     }
 
-    // 2. Deterministic fallback generator
-    return generateGestureForWord(word);
+    // 2. Not in the dictionary — fingerspell it, letter by letter, instead
+    // of inventing a gesture.
+    return fingerspellWord(word);
   });
 
   const totalDuration =

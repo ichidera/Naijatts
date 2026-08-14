@@ -84,3 +84,5 @@ dist-ssr
 *.sw?
 # Executables
 *.exe
+cloudflared.exe
+outreach-and-writeup-drafts.md

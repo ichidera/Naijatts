@@ -1,3 +1,15 @@
+// ─────────────────────────────────────────────────────────────────────────
+// EXPERIMENTAL — NOT IN THE PRODUCTION PATH.
+// This function asks an LLM to generate NSL handshape/position/expression
+// data on the fly. Nothing in the frontend currently calls it (confirmed:
+// no `functions.invoke` reference to "sign-language" anywhere in src/) —
+// the live app uses the dictionary + fingerspelling logic in
+// src/hooks/useSignLanguage.ts instead. Keep it that way until this
+// function's output has been checked against real NSL data by NSL/Deaf
+// reviewers: an LLM with no verified NSL training corpus can produce
+// fluent-looking, schema-valid JSON for a sign that doesn't actually exist,
+// which is a harder failure to catch than an obviously-wrong one.
+// ─────────────────────────────────────────────────────────────────────────
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
