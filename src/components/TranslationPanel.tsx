@@ -6,12 +6,10 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { PronunciationGuide } from "@/components/PronunciationGuide";
-import { SignLanguagePanel } from "@/components/SignLanguagePanel";
 import { useTranslation, type TranslationResult } from "@/hooks/useTranslation";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
 import { usePronunciation } from "@/hooks/usePronunciation";
-import { useAvatarContext } from "@/contexts/AvatarContext";
 
 const NIGERIAN_LANGUAGES = new Set(["Igbo", "Hausa", "Yoruba", "Ikwere"]);
 
@@ -36,7 +34,6 @@ export function TranslationPanel({
   const { speak: speakBrowser, isSpeaking: isSpeakingBrowser, stop: stopBrowser } = useSpeechSynthesis();
   const { speak: speakEL, isSpeaking: isSpeakingEL, isLoading: isELLoading, stop: stopEL, error: elError } = useElevenLabsTTS();
   const { getPronunciation, pronunciationData, isLoading: isPronunciationLoading, clearPronunciation } = usePronunciation();
-  const { setSignData } = useAvatarContext();
 
   const isSpeaking = useElevenLabs ? isSpeakingEL : isSpeakingBrowser;
   const isAudioLoading = useElevenLabs ? isELLoading : false;
@@ -141,10 +138,6 @@ export function TranslationPanel({
 
   const handleVoiceInput = (text: string) => {
     setInputText((prev) => prev + (prev ? " " : "") + text);
-  };
-
-  const handleSignDataReady = (data: any) => {
-    setSignData(data);
   };
 
   return (
@@ -328,7 +321,7 @@ export function TranslationPanel({
         </div>
       </div>
 
-      {/* Pronunciation Guide + Sign Language — only for Nigerian language output */}
+      {/* Pronunciation Guide — only for Nigerian language output */}
       {translatedText && showPronunciation && (
         <div className="mt-4 space-y-4">
           <PronunciationGuide
@@ -336,37 +329,6 @@ export function TranslationPanel({
             language={targetLanguage}
             pronunciationData={pronunciationData}
             isLoading={isPronunciationLoading}
-          />
-          
-          {/*
-            Sign language must run on the ENGLISH side of the translation, not
-            the Nigerian-language output — NSL/ASL are visual-gestural
-            languages with their own grammar, not letter-for-letter
-            re-encodings of Igbo/Hausa/Yoruba text, and fingerspelling has no
-            representation for non-Latin diacritics like ọ/ṣ anyway. This
-            branch renders when targetLanguage is Nigerian, so by this
-            component's English<->Nigerian-language pairing, inputText (what
-            the user actually typed) is the English side — translatedText is
-            not. Getting this backwards is exactly what produced signs like
-            "#ACHỌRỌ" and "#NRI" instead of real English-sourced signs.
-          */}
-          <SignLanguagePanel
-            text={inputText}
-            sourceLanguage={sourceLanguage}
-            onSignDataReady={handleSignDataReady}
-          />
-        </div>
-      )}
-
-      {/* Sign Language only (no pronunciation) for English output */}
-      {translatedText && !showPronunciation && (
-        <div className="mt-4">
-          {/* Here targetLanguage is already English, so translatedText IS
-              the English side — this branch was already correct. */}
-          <SignLanguagePanel
-            text={translatedText}
-            sourceLanguage={targetLanguage}
-            onSignDataReady={handleSignDataReady}
           />
         </div>
       )}
