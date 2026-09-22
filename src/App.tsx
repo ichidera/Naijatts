@@ -9,6 +9,7 @@ import TranslatePage from "./pages/TranslatePage";
 import PhrasesPage from "./pages/PhrasesPage";
 import AboutPage from "./pages/AboutPage";
 import DocumentationPage from "./pages/DocumentationPage";
+import AvatarDemoPage from "./pages/AvatarDemoPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/phrases" element={<PhrasesPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/documentation" element={<DocumentationPage />} />
+              <Route path="/avatar-demo" element={<AvatarDemoPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
