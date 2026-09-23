@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe, Mic, Menu, X, Languages, BookOpen, Info, FileText } from "lucide-react";
+import { Menu, X, Languages, BookOpen, Info, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -30,12 +30,11 @@ export function Layout({ children }: LayoutProps) {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary flex items-center justify-center shadow-card group-hover:scale-105 transition-transform">
-                <Globe className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 md:w-5 md:h-5 rounded-full bg-accent flex items-center justify-center">
-                <Mic className="h-2 w-2 md:h-3 md:w-3 text-accent-foreground" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="NaijaTTS logo"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-card group-hover:scale-105 transition-transform"
+              />
             </div>
             <div className="hidden sm:block">
               <h1 className="font-display font-bold text-lg md:text-xl text-foreground">

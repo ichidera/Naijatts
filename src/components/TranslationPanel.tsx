@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { PronunciationGuide } from "@/components/PronunciationGuide";
+import { SignLanguagePanel } from "@/components/SignLanguagePanel";
 import { useTranslation, type TranslationResult } from "@/hooks/useTranslation";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
@@ -42,6 +43,14 @@ export function TranslationPanel({
   const isReverseMode = NIGERIAN_LANGUAGES.has(sourceLanguage);
   // Should we show pronunciation guide? Only for Nigerian language output
   const showPronunciation = NIGERIAN_LANGUAGES.has(targetLanguage);
+
+  // ASL fingerspelling only makes sense for English text — Igbo/Hausa/
+  // Yoruba/Ikwere have diacritics and letterforms fingerspelling doesn't
+  // represent. Whichever side of THIS translation happens to be English
+  // is what the sign panel signs; if neither side is English (e.g. Igbo →
+  // Hausa) there's nothing for it to show.
+  const englishText =
+    sourceLanguage === "English" ? inputText : targetLanguage === "English" ? translatedText : "";
 
   // Clear inputs on language swap
   useEffect(() => {
@@ -330,6 +339,13 @@ export function TranslationPanel({
             pronunciationData={pronunciationData}
             isLoading={isPronunciationLoading}
           />
+        </div>
+      )}
+
+      {/* Sign Language — only when one side of this translation is English */}
+      {englishText.trim() && (
+        <div className="mt-4">
+          <SignLanguagePanel text={englishText} />
         </div>
       )}
     </div>
