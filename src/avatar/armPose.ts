@@ -20,15 +20,21 @@ import * as THREE from "three";
  *
  * 2. SIGNING: starting from that rest position, a grid search over
  *    (shoulder Z, additional arm X, forearm Z) for the combination whose
- *    forward-kinematic hand position lands closest to a target point in
- *    front of the chest (chest height + 8cm, 30cm toward the viewer)
- *    converged on shoulder +20°/Z, arm +70° more on the same +X axis
- *    (100° total from bind), forearm +82° on -Z — landing within ~7cm of
- *    the target, which is as far as a coordinate-only search (no
- *    real-time rendering available in this environment) can be pushed.
- *    Fine visual polish from here — if the hand still isn't quite where
- *    it should be once actually seen on screen — is a matter of nudging
- *    these three numbers, not re-deriving the approach.
+ *    forward-kinematic hand position lands closest to a target point out
+ *    in front of the shoulder converged on shoulder +40°/Z, arm +90° more
+ *    on the same +X axis (120° total from bind), forearm +58° on -Z.
+ *
+ *    This target was revised once already: the first version placed the
+ *    hand only ~30cm in front of the chest, which turned out to be almost
+ *    exactly where the jacket's lapel decoration sits (the jacket mesh's
+ *    own bounding box peaks at z≈0.163 there) — close enough that the
+ *    hand swept through it during the raise animation, showing up as
+ *    stray pink/green patches (the decoration's colors) poking through
+ *    the fingers. The current target sits further out and higher, up
+ *    near collar height, verified by sampling the hand's z-depth at rest,
+ *    mid-transition, and full extension against that 0.163 jacket-front
+ *    figure — the closest point in the whole swing now clears it by
+ *    roughly 5cm instead of clipping through it.
  */
 export interface ArmBones {
   shoulder: THREE.Bone | null;
@@ -56,9 +62,9 @@ export function collectArmBones(root: THREE.Object3D, hand: "Left" | "Right"): A
 const REST_ARM_X_DEG = 30; // both sides — see derivation above
 
 const SIGNING_EXTRA = {
-  shoulderZDeg: 20,
-  armExtraXDeg: 70, // on top of the 30° rest, so 100° total from bind
-  foreArmNegZDeg: 82,
+  shoulderZDeg: 40,
+  armExtraXDeg: 90, // on top of the 30° rest, so 120° total from bind
+  foreArmNegZDeg: 58,
 };
 
 const deg2rad = (d: number) => (d * Math.PI) / 180;
