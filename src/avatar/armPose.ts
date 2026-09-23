@@ -20,21 +20,27 @@ import * as THREE from "three";
  *
  * 2. SIGNING: starting from that rest position, a grid search over
  *    (shoulder Z, additional arm X, forearm Z) for the combination whose
- *    forward-kinematic hand position lands closest to a target point out
- *    in front of the shoulder converged on shoulder +40°/Z, arm +90° more
- *    on the same +X axis (120° total from bind), forearm +58° on -Z.
+ *    forward-kinematic hand position lands closest to a target point
+ *    above collar height and well forward converged on shoulder +57°/Z,
+ *    arm +108° more on the same +X axis (138° total from bind), forearm
+ *    +40° on -Z.
  *
- *    This target was revised once already: the first version placed the
- *    hand only ~30cm in front of the chest, which turned out to be almost
- *    exactly where the jacket's lapel decoration sits (the jacket mesh's
- *    own bounding box peaks at z≈0.163 there) — close enough that the
- *    hand swept through it during the raise animation, showing up as
- *    stray pink/green patches (the decoration's colors) poking through
- *    the fingers. The current target sits further out and higher, up
- *    near collar height, verified by sampling the hand's z-depth at rest,
- *    mid-transition, and full extension against that 0.163 jacket-front
- *    figure — the closest point in the whole swing now clears it by
- *    roughly 5cm instead of clipping through it.
+ *    This target has been revised twice now. The first version placed
+ *    the hand ~30cm in front of the chest — almost exactly where the
+ *    jacket's lapel decoration sits (its bounding box peaks at z≈0.163
+ *    there), so the hand swept through it, showing the decoration's
+ *    colors poking through the fingers in a screenshot. A second attempt
+ *    aimed for collar height with a 5cm margin — a screen recording of
+ *    that build showed the hand still landing on the decoration, meaning
+ *    5cm wasn't actually enough clearance in practice. This version goes
+ *    well above the neck instead of just to collar height, and was
+ *    checked by sampling the hand's forward depth at five points along
+ *    the whole raise (t=0, 0.25, 0.5, 0.75, 1.0), not just the endpoint —
+ *    every sampled point now clears the jacket's front-most measured
+ *    point by at least 7cm, and the resting signing position (where the
+ *    hand spends most of its time, between letters) sits above the neck
+ *    entirely, well clear of anything at chest height regardless of
+ *    exactly where on the lapel the decoration sits.
  */
 export interface ArmBones {
   shoulder: THREE.Bone | null;
@@ -62,9 +68,9 @@ export function collectArmBones(root: THREE.Object3D, hand: "Left" | "Right"): A
 const REST_ARM_X_DEG = 30; // both sides — see derivation above
 
 const SIGNING_EXTRA = {
-  shoulderZDeg: 40,
-  armExtraXDeg: 90, // on top of the 30° rest, so 120° total from bind
-  foreArmNegZDeg: 58,
+  shoulderZDeg: 57,
+  armExtraXDeg: 108, // on top of the 30° rest, so 138° total from bind
+  foreArmNegZDeg: 40,
 };
 
 const deg2rad = (d: number) => (d * Math.PI) / 180;

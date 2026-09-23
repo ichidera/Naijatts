@@ -69,10 +69,19 @@ export const SignAvatar3D = forwardRef<SignAvatar3DHandle, SignAvatar3DProps>(
           if (handRef.current) applyLetterPose(handRef.current, pose);
         },
         playPose(pose, durationMs) {
-          const hand = handRef.current;
-          if (!hand) return;
-          // Capture whatever the hand's current blended pose effectively is
-          // by using the pose we were last animating toward (or rest).
+          // Always queue the transition — don't bail out just because
+          // handRef.current isn't populated yet. On a fresh mount the GLB
+          // can still be mid-fetch/parse when the first letter is played,
+          // and this used to check readiness here and silently drop the
+          // pose command if not ready. setArmRaised, right below, never
+          // had that check — it always queues and lets useFrame apply it
+          // once `hand`/`arm` actually exist. That asymmetry is exactly
+          // what could desync the two forever: the arm-raise survives a
+          // slow load (queued once, applied whenever ready), but every
+          // playPose call for that whole word had already bailed out
+          // before the hand was ready, so the fingers never moved for the
+          // rest of the session. Matching the same always-queue pattern
+          // here removes that failure mode.
           const from = transition.current?.to ?? REST_POSE;
           transition.current = { from, to: pose, startedAt: performance.now(), durationMs };
         },
