@@ -19,4 +19,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split the 3D stack into its own cacheable chunk. It's already
+          // lazy-loaded (see App.tsx / TranslationPanel.tsx), so this
+          // isn't what keeps it out of the initial page load — it's what
+          // keeps that chunk itself stable across app deploys that don't
+          // touch three.js, so returning visitors don't re-download it.
+          "vendor-three": ["three", "@react-three/fiber", "@react-three/drei"],
+        },
+      },
+    },
+  },
 }));

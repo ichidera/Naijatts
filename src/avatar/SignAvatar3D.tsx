@@ -1,9 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
-import { collectHandBones, applyLetterPose, slerpTowardLetterPose, type HandBones } from "./handRetarget";
-import { collectArmBones, applySigningArmPose, type ArmBones } from "./armPose";
+import { collectHandBones, applyLetterPose, applyFingerCurls, slerpTowardLetterPose, type HandBones } from "./handRetarget";
+import { collectArmBones, applyRestArmPose, applySigningArmPose, type ArmBones } from "./armPose";
 import { REST_POSE, type LetterPose } from "@/data/fingerspellingPoses";
 
 export interface SignAvatar3DHandle {
@@ -18,8 +17,12 @@ export interface SignAvatar3DHandle {
 interface SignAvatar3DProps {
   /** Path to the GLB, e.g. "/models/avatar.glb". */
   src: string;
+  /** Which hand does the signing. The other hand and both arms otherwise
+   *  just sit in the relaxed rest pose (see armPose.ts). */
   handedness?: "Left" | "Right";
 }
+
+const OPPOSITE: Record<"Left" | "Right", "Left" | "Right"> = { Left: "Right", Right: "Left" };
 
 /**
  * Loads the rigged GLB and exposes an imperative handle for posing the
@@ -45,9 +48,17 @@ export const SignAvatar3D = forwardRef<SignAvatar3DHandle, SignAvatar3DProps>(
     const armAmount = useRef(0);
 
     useEffect(() => {
+      // Signing hand + arm: driven dynamically (see useImperativeHandle/useFrame below).
       handRef.current = collectHandBones(scene, handedness);
       armRef.current = collectArmBones(scene, handedness);
       if (handRef.current) applyLetterPose(handRef.current, REST_POSE);
+      if (armRef.current) applyRestArmPose(armRef.current);
+
+      // Non-signing hand + arm: set once to a relaxed rest pose and left alone.
+      const otherHand = collectHandBones(scene, OPPOSITE[handedness]);
+      const otherArm = collectArmBones(scene, OPPOSITE[handedness]);
+      applyFingerCurls(otherHand, REST_POSE.curls);
+      applyRestArmPose(otherArm);
     }, [scene, handedness]);
 
     useImperativeHandle(

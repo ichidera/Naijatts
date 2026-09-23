@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense, lazy } from "react";
 import { Volume2, VolumeX, Copy, Check, ArrowRightLeft, Loader2, Sparkles, Zap, BookOpen, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,11 +6,19 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { PronunciationGuide } from "@/components/PronunciationGuide";
-import { SignLanguagePanel } from "@/components/SignLanguagePanel";
 import { useTranslation, type TranslationResult } from "@/hooks/useTranslation";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
 import { usePronunciation } from "@/hooks/usePronunciation";
+
+// The sign panel pulls in three.js + @react-three/fiber/drei (~1MB+
+// before gzip). Loading that eagerly meant every visit to the translate
+// page paid for it even when the translation never touches English (so
+// the panel never renders). Code-splitting it here means that cost is
+// only paid the first time englishText is actually non-empty.
+const SignLanguagePanel = lazy(() =>
+  import("@/components/SignLanguagePanel").then((m) => ({ default: m.SignLanguagePanel }))
+);
 
 const NIGERIAN_LANGUAGES = new Set(["Igbo", "Hausa", "Yoruba", "Ikwere"]);
 
@@ -345,7 +353,15 @@ export function TranslationPanel({
       {/* Sign Language — only when one side of this translation is English */}
       {englishText.trim() && (
         <div className="mt-4">
-          <SignLanguagePanel text={englishText} />
+          <Suspense
+            fallback={
+              <div className="glass-card rounded-2xl p-6 flex items-center justify-center" style={{ height: 320 }}>
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            }
+          >
+            <SignLanguagePanel text={englishText} />
+          </Suspense>
         </div>
       )}
     </div>
